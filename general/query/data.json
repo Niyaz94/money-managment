@@ -1,0 +1,28 @@
+{
+    "decsrition":{
+        "type":{
+            "num":"number value",
+            "str":"string value",
+            "var":"add the variable",
+            "ref":"conect two tables",
+            "fun":"calling the function"
+        }
+    },
+    "banner_channel":{
+        "select":["Banner.id","priority","content","title","period","endTime","startTime","endDate","startDate"],
+        "from":["Banner","banner_channel"],
+        "where":[
+            {"key":"Banner.deleted"        ,"operation":"=" ,"value":0                        ,"type":"num","link":"And","group":[1,"And"]},
+            {"key":"Banner.id"             ,"operation":"=" ,"value":"banner_channel.bannerId","type":"ref","link":"And","group":[1,"And"]},
+            {"key":"banner_channel.deleted","operation":"=" ,"value":0                        ,"type":"num","link":"And","group":[1,"And"]},
+            {"key":"status"                ,"operation":"=" ,"value":0                        ,"type":"num","link":"And","group":[1,"And"]},
+            {"key":"channelId"             ,"operation":"=" ,"value":"id"                     ,"type":"var","link":"And","group":[1,"And"]},
+            {"key":"startDate"             ,"operation":"<=","value":"cur_date"               ,"type":"fun","link":"And","group":[1,"And"]},
+            {"key":"endDate"               ,"operation":">" ,"value":"cur_date"               ,"type":"fun","link":"And","group":[1,"And"]},
+            {"key":"startTime"             ,"operation":"<=","value":"cur_time"               ,"type":"fun","link":"And","group":[1,"And"]},
+            {"key":"endTime"               ,"operation":">" ,"value":"cur_time"               ,"type":"fun","link":"And","group":[1,"And"]}
+        ],
+        "order":[["priority","ASC"]],
+        "subquery":{}
+    }
+}
