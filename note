@@ -1,0 +1,10 @@
+1 - validation                  ===>>>
+2 - authentication              ===>>>
+3 - production version          ===>>>
+4 - file for collecting errors  ===>>>
+5 - returning from files        ===>>>
+6 - saving images               ===>>>
+7 - socket.io                   ===>>>
+8 - security                    ===>>>
+9 - return one row for getOne   ===>>>
+10- working with files          ===>>>
