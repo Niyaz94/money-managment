@@ -7,7 +7,7 @@ const money_type_controller=require("../controllers/money_type");
 
 router.post(
     "/",
-    require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
+    //require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
     money_type_controller.insertData
 );
 

@@ -5,12 +5,10 @@ const exec=require("../database/query").exec;
 
 
 exports.getData=function(req,res){
-    res.send(__dirname);
     if(isNaN(req.params.id) || req.params.id <1){
         res.status(400).json({"response":"The coming data uncorrect!!!"});
         return;
     }
-
     const query='SELECT id,name FROM `money_type` where id=? and deleted_at is null';
     exec(query,[req.params.id])().then(function(results){
         res.status(200).json(results);
@@ -29,6 +27,9 @@ exports.getAllData=function(req,res){
 }
 
 exports.insertData=function(req,res){
+
+    res.send(req.file)
+    return ;
     if (typeof req.body.name === 'undefined') {
         res.status(400).json({"response":"The request does not contain enough data to process!!!"});
         return;
