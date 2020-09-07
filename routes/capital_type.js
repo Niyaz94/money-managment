@@ -2,25 +2,25 @@ const express =require("express");
 const router = express.Router();
 
 
-const expense_type_controller=require("../controllers/expense_type");
+const capital_type_controller=require("../controllers/capital_type");
 
 router.post(
     "/",
     require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-    expense_type_controller.insertData
+    capital_type_controller.insertData
 );
 
 router.put(
     "/:id",
     require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-    expense_type_controller.updateData
+    capital_type_controller.updateData
 );
 
-router.get("/:id",expense_type_controller.getData);
-router.get("/",expense_type_controller.getAllData);
+router.get("/:id",capital_type_controller.getData);
+router.get("/",capital_type_controller.getAllData);
 
 
-router.delete("/:id",expense_type_controller.deleteData);
+router.delete("/:id",capital_type_controller.deleteData);
 
 
 module.exports=router;
