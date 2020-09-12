@@ -1,5 +1,4 @@
 const exec=require("../database/query").exec;
-const moment = require('moment');
 
 
 
@@ -25,6 +24,5 @@ exports.checkIncomeType=async (income_type_id)=>{
     return result;
 }
 
-exports.isDate=(date)=>{
-    return moment(date, "YYYY-MM-DD", true).isValid();
-}
+
+

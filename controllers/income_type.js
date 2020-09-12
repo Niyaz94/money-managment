@@ -54,7 +54,6 @@ exports.updateData=function(req,res){
         return;
     }
     const query='SELECT count(`id`) as total FROM `income_type` where id=? and deleted_at is null';
-    
     exec(query,[req.params.id],2)().then(function(total){
 
         if(total==1){
