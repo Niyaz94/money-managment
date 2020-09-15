@@ -1,9 +1,9 @@
 const moment = require('moment');
 
 const exec=require("../database/query").exec;
-const check=require("../general/check");
-const needs=require("../general/needs");
-const capital_operations=require("../general/capital_operations");
+const check=require("../util/check");
+const needs=require("../util/needs");
+const capital_operations=require("../util/capital_operations");
 
 const income_row=async (id=0)=>{
     const query=`

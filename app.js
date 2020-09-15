@@ -8,6 +8,10 @@ const multer=require("multer");
 
 const logger = require('morgan');
 
+
+const sequelize =require('./util/database');
+
+
 var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,5 +50,13 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+//sequelize.sync({ force: true }).then(result=>{
+//  //console.log(result);
+//}).catch(err=>{
+//  console.log(err);
+//});
+sequelize.sync({ force: true });
+
 
 module.exports = app;
