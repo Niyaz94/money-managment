@@ -1,6 +1,5 @@
 const moment = require('moment');
 
-const exec=require("../database/query").exec;
 const needs=require("./needs");
 
 

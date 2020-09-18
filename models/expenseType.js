@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 const sequelize =require('../util/database');
-const MoneyType=sequelize.define('moneyType',{
+const expenseType=sequelize.define('expenseType',{
     id:{
         type:DataTypes.INTEGER,
         autoIncrement:true,
@@ -12,20 +12,16 @@ const MoneyType=sequelize.define('moneyType',{
         type:DataTypes.STRING,
         unique: true,
         allowNull:false,
-        get: function (){// not use arrow function becuse it does not contain this object
-            return this.getDataValue('name').toUpperCase();
-        },
-        set(value) {
-            this.setDataValue('name',value.toLowerCase());
-        },
         validate:{
             len: [3,10],
             notNull: true,            // won't allow null
             notEmpty: true,           // don't allow empty strings
         }
-      
+    },
+    note: {
+        type: DataTypes.TEXT,
+        allowNull:true
     }
-
 },{
     paranoid: true,
     timestamps: true,
@@ -33,5 +29,4 @@ const MoneyType=sequelize.define('moneyType',{
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at'
 });
-
-module.exports= MoneyType;
+module.exports= expenseType;

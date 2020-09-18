@@ -1,4 +1,3 @@
-const exec=require("../database/query").exec;
 
 
 

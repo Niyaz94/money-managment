@@ -1,18 +1,14 @@
-const moment = require('moment');
-
-const exec=require("../database/query").exec;
-
+const expenseType=require("../models/expenseType");
 
 exports.getData=function(req,res){
     if(isNaN(req.params.id) || req.params.id <1){
         res.status(400).json({"response":"The coming data uncorrect!!!"});
         return;
     }
-    const query='SELECT id,name,note FROM `expense_type` where id=? and deleted_at is null';
-    exec(query,[req.params.id],1)().then(function(results){
-        res.status(200).json(results);
-    }).catch(function(err){
-        res.status(400).send("something wrong with database");
+    expenseType.findByPk(req.params.id).then(result=>{
+        res.status(200).json(result);
+    }).catch(err=>{
+        res.status(400).json(err);
     })  
 }
 

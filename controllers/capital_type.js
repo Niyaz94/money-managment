@@ -1,7 +1,5 @@
 const moment = require('moment');
 
-const exec=require("../database/query").exec;
-
 
 exports.getData=function(req,res){
     if(isNaN(req.params.id) || req.params.id <1){

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 const sequelize =require('../util/database');
-const MoneyType=sequelize.define('moneyType',{
+const capitalType=sequelize.define('capitalType',{
     id:{
         type:DataTypes.INTEGER,
         autoIncrement:true,
@@ -24,7 +24,33 @@ const MoneyType=sequelize.define('moneyType',{
             notEmpty: true,           // don't allow empty strings
         }
       
+    },
+    transfer_type: {
+        type: DataTypes.ENUM,
+        allowNull: false,
+        values: ['push', 'pull'],
+        validate:{
+            notNull: true,     
+            notEmpty: true,
+            isIn: [['push', 'pull']]
+        }
+    },
+    row_type: {
+        type: DataTypes.ENUM,
+        allowNull: false,
+        defaultValue: "dynamic",
+        values: ['static', 'dynamic'],
+        validate:{
+            notNull: true,     
+            notEmpty: true,
+            isIn: [['static', 'dynamic']]
+        }
+    },
+    note: {
+        type: DataTypes.TEXT,
+        allowNull:true
     }
+    
 
 },{
     paranoid: true,
@@ -34,4 +60,4 @@ const MoneyType=sequelize.define('moneyType',{
     deletedAt: 'deleted_at'
 });
 
-module.exports= MoneyType;
+module.exports= capitalType;
