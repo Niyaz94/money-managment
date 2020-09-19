@@ -1,27 +1,7 @@
+const {Op}              =require("sequelize");
 
+const moneyType         =require('../models/moneyType');
+const incomeType        =require('../models/incomeType');
 
-
-exports.checkMoneyType=async (money_type_id)=>{
-    const query='SELECT count(*) as total FROM `money_type` where id=? and deleted_at is null';
-    let result=0;
-    await exec(query,[money_type_id],2)().then(total=>{
-        result= total;
-    }).catch(function(err){
-        result= 0;
-    }) 
-    return result;
-}
-
-exports.checkIncomeType=async (income_type_id)=>{
-    const query='SELECT count(*) as total FROM `income_type` where id=? and deleted_at is null';
-    let result=0;
-    await exec(query,[income_type_id],2)().then(total=>{
-        result= total;
-    }).catch(function(err){
-        result= 0;
-    }) 
-    return result;
-}
-
-
-
+exports.checkMoneyType=async (money_type_id)=> await moneyType.count({where:{id:{[Op.eq]:money_type_id}}});
+exports.checkIncomeType=async (income_type_id)=> await incomeType.count({where:{id:{[Op.eq]:income_type_id}}});

@@ -13,7 +13,7 @@ const incomeType=sequelize.define('incomeType',{
         unique: true,
         allowNull:false,
         validate:{
-            len: [3,10],
+            len: [3,20],
             notNull: true,            // won't allow null
             notEmpty: true,           // don't allow empty strings
         }
@@ -28,7 +28,13 @@ const incomeType=sequelize.define('incomeType',{
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    deletedAt: 'deleted_at'
+    deletedAt: 'deleted_at',
+    indexes:[
+        {
+            name: 'income_type_index',
+            fields: ['name']
+        }
+    ]
 });
 
 module.exports= incomeType;

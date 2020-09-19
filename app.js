@@ -1,20 +1,12 @@
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
+const createError   = require('http-errors');
+const express       = require('express');
+const path          = require('path');
+const cookieParser  = require('cookie-parser');
+const bodyParser    = require('body-parser');
+const multer        = require("multer");
+const logger        = require('morgan');
 
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const multer=require("multer");
-
-const logger = require('morgan');
-
-
-const sequelize =require('./util/database');
-const moneyType =require('./models/moneyType');
-const capitalType =require('./models/capitalType');
-const incomeType =require('./models/incomeType');
-const expenseType =require('./models/expenseType');
-
+const db_sync       = require("./util/sync");
 
 var app = express();
 // view engine setup
@@ -49,18 +41,10 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
   // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
-
-sequelize.sync(/*{ force: true }*/).then(result=>{
-  //console.log(result);
-}).catch(err=>{
-  console.log(err);
-});
-
-
-
+//syncronizing with database
+db_sync();
 module.exports = app;

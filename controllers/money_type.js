@@ -8,7 +8,7 @@ exports.getData=function(req,res){
     moneyType.findByPk(req.params.id,{
         attributes: ['id','name','created_at']
     }).then(result=>{
-        res.status(200).json(result);
+        res.status(result==null?400:200).json(result==null?{"response":"This row not found!!!"}:result);
     }).catch(err=>{
         res.status(400).json(err);
     }) 
@@ -56,7 +56,7 @@ exports.updateData=function(req,res){
     }).then(update_result=>{
         res.status(200).json({"response":"This data has been updated successfully!!!"});
     }).catch(err=>{
-        res.status(400).json({"response":"The Data not found in the database!!!"});
+        res.status(400).json({"response":err.errors[0].message});
     });
 }
 exports.deleteData=function(req,res){
@@ -66,7 +66,7 @@ exports.deleteData=function(req,res){
     }
     moneyType.findByPk(req.params.id).then(moneyType=>{
         return moneyType.destroy();
-    }).then(update_result=>{
+    }).then(deleted_result=>{
         res.status(200).json({"response":"This data has been deleted successfully!!!"});
     }).catch(err=>{
         res.status(400).json({"response":"The Data not found in the database!!!"});

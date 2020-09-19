@@ -1,7 +1,9 @@
+const sequelize =require('./database');
+const { QueryTypes } =require("sequelize");
+
 const moment = require('moment');
 
 const needs=require("./needs");
-
 
 
 const has_money_in_capital=async (amount,money_type)=>{
@@ -47,7 +49,7 @@ const calculatte_remain_money=(old_money,new_money,type)=>{
 const current_total=async (row_type="all")=>{
     const query=`
         SELECT
-        	money_type.name as name,
+        	moneyTypes.name as name,
             SUM(
                 IF(
                     transfer_type = 'push',
@@ -63,20 +65,23 @@ const current_total=async (row_type="all")=>{
                 )
             ) as pull
         FROM
-            capital,
-            capital_type,
-            money_type
+            capitals,
+            capitalTypes,
+            moneyTypes
         WHERE
-            capital.deleted_at IS NULL AND 
-            capital_type.deleted_at IS NULL AND 
-            money_type.deleted_at IS NULL AND 
-            capital_type.id = capital.capital_type_fid AND
-            money_type.id = capital.money_type_fid
+            capitals.deleted_at IS NULL AND 
+            capitalTypes.deleted_at IS NULL AND 
+            moneyTypes.deleted_at IS NULL AND 
+            capitalTypes.id = capitals.capitalTypeId AND
+            moneyTypes.id = capitals.moneyTypeId
         GROUP BY
-            money_type_fid
+            moneyTypeId
     `;
     let data=[];
-    await exec(query,[])().then(result=>{
+    await sequelize.query(query,{
+        type: QueryTypes.SELECT //without this line it is not working perfectly
+    })
+    .then(result=>{
         data=row_type=="all"?result:result.filter(row=>row["name"]==row_type)[0];
     }).catch(function(err){
     }) 
@@ -102,5 +107,6 @@ module.exports={
     has_money_in_capital:has_money_in_capital,
     find_remain_money:find_remain_money,
     calculatte_remain_money:calculatte_remain_money,
-    save_into_capital:save_into_capital
+    save_into_capital:save_into_capital,
+    current_total:current_total
 }

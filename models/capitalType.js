@@ -50,14 +50,18 @@ const capitalType=sequelize.define('capitalType',{
         type: DataTypes.TEXT,
         allowNull:true
     }
-    
-
 },{
     paranoid: true,
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
-    deletedAt: 'deleted_at'
+    deletedAt: 'deleted_at',
+    indexes:[
+        {
+            name: 'capital_type_index',
+            fields: ['name']
+        }
+    ]
 });
 
 module.exports= capitalType;

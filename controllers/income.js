@@ -1,8 +1,12 @@
-const moment = require('moment');
+const income        = require("../models/income");
+const capital       = require("../models/capital");
+const incomeType    = require("../models/incomeType");
+const moneyType     = require("../models/moneyType");
 
 const check=require("../util/check");
 const needs=require("../util/needs");
 const capital_operations=require("../util/capital_operations");
+
 
 const income_row=async (id=0)=>{
     const query=`
@@ -36,51 +40,64 @@ const income_row=async (id=0)=>{
     }) 
     return data;
 }
-exports.getData=async (req,res)=>{
+exports.getData=(req,res)=>{
     if(isNaN(req.params.id) || req.params.id <1){
         res.status(400).json({"response":"The coming data uncorrect!!!"});
         return;
     }
-    res.status(200).json((await income_row(req.params.id)));
+    income.findByPk(req.params.id,{
+        include:[
+            {
+                model:moneyType,
+                attributes: ['id','name'],
+                where:{},
+                order:[]
+            },
+            {
+                model:incomeType,
+                attributes: ['id','name'],
+                where:{},
+                order:[]
+            }
+        ],
+        attributes: ['id','amount','date','note',['created_at','datetime']]
+    }).then(result=>{
+        res.status(result==null?400:200).json(result==null?{"response":"This row not found!!!"}:result);
+    }).catch(err=>{
+        res.status(400).json(err);
+    }) 
 }
-
 exports.getAllData=function(req,res){
-    const query=`
-        SELECT
-            income.id,
-            money_type.name as 'money_type',
-            income_type.name as 'income_type',
-            amount,
-            date,
-            income.note
-        FROM
-            income,
-            money_type,
-            income_type
-        WHERE
-            income.deleted_at is null AND    
-            money_type.deleted_at is null AND    
-            income_type.deleted_at is null AND
-            money_type.id=money_type_fid AND
-            income_type.id=income_type_fid
-    
-    `;
-    exec(query,[])().then(function(results){
-        res.status(200).json(results);
-    }).catch(function(err){
-        res.status(400).send("something wrong with database");
-    })  
+    income.findAll({
+        include:[
+            {
+                model:moneyType,
+                attributes: ['id','name'],
+                where:{},
+                order:[]
+            },
+            {
+                model:incomeType,
+                attributes: ['id','name'],
+                where:{},
+                order:[]
+            }
+        ],
+        attributes: ['id','amount','date','note',['created_at','datetime']]
+    }).then(result=>{
+        res.status(200).json(result);
+    }).catch(err=>{
+        res.status(400).json(err);
+    })   
 }
-
 exports.insertData=async function(req,res){
-
     if (typeof req.body.date === 'undefined' || typeof req.body.amount === 'undefined' || typeof req.body.incomeTypeFid === 'undefined' || typeof req.body.moneyTypeFid === 'undefined') {
         res.status(400).json({"response":"The request does not contain enough data to process!!!"});
         return;
     }else if(!needs.isDate(req.body.date)){
         res.status(400).json({"response":"The date field should has this format [ YYYY-MM-DD ] !!!"});
         return;
-    }else if(isNaN(req.body.incomeTypeFid) || (await check.checkMoneyType(req.body.incomeTypeFid))!=1){
+    }else if(isNaN(req.body.incomeTypeFid) || (await check.checkIncomeType(req.body.incomeTypeFid))!=1){
         res.status(400).json({"response":"The incomeTypeFid field should be number && exist in the Database !!!"});
         return;
     }else if(isNaN(req.body.moneyTypeFid) || (await check.checkMoneyType(req.body.moneyTypeFid))!=1){
@@ -90,41 +107,28 @@ exports.insertData=async function(req,res){
         res.status(400).json({"response":"The amount field should be number && bigger than zero !!!"});
         return;
     }
+    income.create({
+        "amount":req.body.amount,
+        "date":req.body.date,
+        "note":req.body.note
+    }).then(new_income=>{
+        new_income.setMoneyType(req.body.moneyTypeFid);
+        new_income.setIncomeType(req.body.incomeTypeFid);
+        capital.create({
+            "amount":req.body.amount,
+            "date":req.body.date,
+            "note":req.body.note
+        }).then(new_capital=>{
+            new_capital.setMoneyType(req.body.moneyTypeFid);
+            new_capital.setCapitalType(1);
+        }).catch(err=>{
+            res.status(400).json({"response":err.errors[0].message});
+        });
 
-    const query='INSERT INTO `income`(`money_type_fid`,`income_type_fid`,`amount`,`date`,`note`,`created_at`)VALUES(?,?,?,?,?,?)';
-    const value=[
-        req.body.moneyTypeFid,
-        req.body.incomeTypeFid,
-        req.body.amount,
-        req.body.date,
-        req.body.note,
-        (moment().format("YYYY-MM-DD H:mm:ss"))
-    ];
-    exec(query,value)().then(function(results){
-        const query=`
-            INSERT INTO capital(
-                capital_type_fid,
-                money_type_fid,
-                amount,
-                date,
-                note,
-                created_at
-            )
-            VALUES(?,?,?,?,?,?)
-        `;
-        const value=[
-            1,
-            req.body.moneyTypeFid,
-            req.body.amount,
-            req.body.date,
-            req.body.note,
-            (moment().format("YYYY-MM-DD H:mm:ss"))
-        ];
-        exec(query,value)();
-        res.status(200).json({"response":`The new row has been added with id ${results.insertId}`});
-    }).catch(function(err){
-        res.status(400).send("something wrong with database");
-    }) 
+        res.status(200).json({"response":`The new row has been added with id ${new_income.id}`});
+    }).catch(err=>{
+        res.status(400).json({"response":err.errors[0].message});
+    });
 }
 
 exports.updateData=async function(req,res){
@@ -201,13 +205,13 @@ exports.deleteData=async function(req,res){
         res.status(400).json({"response":"The coming data uncorrect!!!"});
         return;
     }
-
-    const {id=0,money_type,amount,money_type_fid,...others}=await income_row(req.params.id);
-    if(id===0){
+    console.log((await capital_operations.current_total()));
+    income.findByPk(req.params.id).then(async result=>{
+        res.status(200).json((await capital_operations.current_total()));
+    }).catch(err=>{
         res.status(400).json({"response":"There are no income with this id!!!"});
-        return;
-    }
-
+    });
+    return;
     if(!(await capital_operations.has_money_in_capital(amount,money_type))){
         res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
     }
