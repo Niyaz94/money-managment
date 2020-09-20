@@ -1,3 +1,5 @@
+const moment        = require("moment");
+
 const income        = require("../models/income");
 const capital       = require("../models/capital");
 const incomeType    = require("../models/incomeType");
@@ -199,30 +201,25 @@ exports.updateData=async function(req,res){
         res.status(400).json("something wrong with database");
     }) 
 }
-
 exports.deleteData=async function(req,res){
     if(isNaN(req.params.id) || req.params.id <1){
         res.status(400).json({"response":"The coming data uncorrect!!!"});
         return;
     }
-    console.log((await capital_operations.current_total()));
-    income.findByPk(req.params.id).then(async result=>{
-        res.status(200).json((await capital_operations.current_total()));
+    income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['name']}}).then(async result=>{
+        if(!(await capital_operations.has_money_in_capital(result.amount,result.moneyType.name))){
+            res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
+        }else{
+            capital.create({
+                "amount":result.amount,
+                "date":moment().format("YYYY-MM-DD"),
+                "moneyTypeId":result.moneyTypeId,
+                "capitalTypeId":2
+            });
+            result.destroy();
+            res.status(200).json({"response":"This data has been deleted successfully!!!"});
+        }
     }).catch(err=>{
         res.status(400).json({"response":"There are no income with this id!!!"});
     });
-    return;
-    if(!(await capital_operations.has_money_in_capital(amount,money_type))){
-        res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-    }
-
-    const query='update `income` set `deleted_at`=? where id=?';
-    const value=[(moment().format("YYYY-MM-DD H:mm:ss")),req.params.id];
-    exec(query,value)().then(function(results){
-        capital_operations.save_into_capital({capital_type_fid:2,amount:amount,money_type_fid:money_type_fid});
-        res.status(200).json({"response":"This data has been deleted successfully!!!"});
-    }).catch(function(err){
-        res.status(400).json("something wrong with database");
-    }) 
-
 }
