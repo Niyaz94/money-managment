@@ -141,7 +141,7 @@ exports.updateData=async function(req,res){
     }else if(!needs.isDate(req.body.date)){
         res.status(400).json({"response":"The date field should has this format [ YYYY-MM-DD ] !!!"});
         return;
-    }else if(isNaN(req.body.incomeTypeFid) || (await check.checkMoneyType(req.body.incomeTypeFid))!=1){
+    }else if(isNaN(req.body.incomeTypeFid) || (await check.checkIncomeType(req.body.incomeTypeFid))!=1){
         res.status(400).json({"response":"The incomeTypeFid field should be number && exist in the Database !!!"});
         return;
     }else if(isNaN(req.body.moneyTypeFid) || (await check.checkMoneyType(req.body.moneyTypeFid))!=1){
@@ -154,52 +154,60 @@ exports.updateData=async function(req,res){
         res.status(400).json({"response":"The coming data uncorrect!!!"});
         return;
     }
-    const {id=0,money_type_fid,money_type,amount,...others}=await income_row(req.params.id);
-    
-    if(id===0){
-        res.status(400).json({"response":"There are no income with this id!!!"});
-        return;
+    try {
+        previous_income=await income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['name']}});
+        if(previous_income===null){
+            res.status(400).json({"response":"There are no income with this id!!!"});
+            return res.end();
+        }
+        //if they are the same currency
+        if(previous_income.moneyTypeId===req.body.moneyTypeFid){
+            if((compare_amount=capital_operations.find_remain_money(previous_income.amount,req.body.amount,"push"))>0 && !(await capital_operations.has_money_in_capital(compare_amount,previous_income.moneyType.name))){
+                res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
+                return;
+            }
+            console.log(previous_income);
+            const compare_money=capital_operations.calculatte_remain_money(previous_income.amount,req.body.amount,"income");
+            if(compare_money[0]!=0){
+                capital.create({
+                    "amount":compare_money[1],
+                    "date":moment().format("YYYY-MM-DD"),
+                    "moneyTypeId":previous_income.moneyTypeId,
+                    "capitalTypeId":compare_money[0]
+                });
+            }
+        }else{//if it is different currency
+            if(!(await capital_operations.has_money_in_capital(previous_income.amount,money_type))){
+                res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
+                return;
+            }
+            capital.bulkCreate([{
+                "amount":previous_income.amount,
+                "date":moment().format("YYYY-MM-DD"),
+                "moneyTypeId":previous_income.moneyTypeId,
+                "capitalTypeId":2
+            },{
+                "amount":Number(req.body.amount),
+                "date":moment().format("YYYY-MM-DD"),
+                "moneyTypeId":req.body.moneyTypeFid,
+                "capitalTypeId":1
+            }]);
+        }
+        try{
+            await previous_income.update({
+                "moneyTypeId":req.body.moneyTypeFid,
+                "incomeTypeId":req.body.incomeTypeFid,
+                "amount":req.body.amount,
+                "date":req.body.date,
+                "note":req.body.note
+            });
+            res.status(200).json({"response":"This data has been updated successfully!!!"});
+        }catch(err){
+            res.status(400).json("There is something wrong with updating income");
+        }
+    }catch(err){
+        res.status(400).json({"response":"There is something wrong with check data!!!"});
     }
-    //if they are the same currency
-    if(money_type_fid===req.body.moneyTypeFid){
-        if((compare_amount=capital_operations.find_remain_money(amount,req.body.amount,"push"))>0 && !(await capital_operations.has_money_in_capital(compare_amount,money_type))){
-            res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-            return;
-        }
-        const compare_money=capital_operations.calculatte_remain_money(amount,req.body.amount,"income");
-        if(compare_money[0]!=0){
-            capital_operations.save_into_capital({capital_type_fid:compare_money[0],amount:compare_money[1],money_type_fid:money_type_fid});
-        }
-    }else{//if it is different currency
-        if(!(await capital_operations.has_money_in_capital(amount,money_type))){
-            res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-            return;
-        }
-        // first  => pull the old money
-        capital_operations.save_into_capital({capital_type_fid:2,amount:amount,money_type_fid:money_type_fid});
-        // second => push the new money
-        capital_operations.save_into_capital({capital_type_fid:1,amount:Number(req.body.amount),money_type_fid:req.body.moneyTypeFid});
-    }
-    const query=`
-        UPDATE
-            income
-        SET
-            money_type_fid =? ,
-            income_type_fid =?,
-            amount =?,
-            date =?,
-            note =?,
-            updated_at = ?
-        WHERE
-            id=? AND
-            deleted_at is null
-    `;
-    const value=[req.body.moneyTypeFid,req.body.incomeTypeFid,req.body.amount,req.body.date,req.body.note,(moment().format("YYYY-MM-DD H:mm:ss")),req.params.id];
-    exec(query,value)().then(function(results){
-        res.status(200).json({"response":"This data has been updated successfully!!!"});
-    }).catch(function(err){
-        res.status(400).json("something wrong with database");
-    }) 
 }
 exports.deleteData=async function(req,res){
     if(isNaN(req.params.id) || req.params.id <1){
