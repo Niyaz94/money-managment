@@ -1,10 +1,6 @@
-const moneyType=require("../models/moneyType");
+const moneyType= require("../models/moneyType");
 
 exports.getData=function(req,res){
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }
     moneyType.findByPk(req.params.id,{
         attributes: ['id','name','created_at']
     }).then(result=>{
@@ -23,13 +19,6 @@ exports.getAllData=function(req,res){
     }) 
 }
 exports.insertData=function(req,res){
-    if (typeof req.body.name === 'undefined') {
-        res.status(400).json({"response":"The request does not contain enough data to process!!!"});
-        return;
-    }else if(req.body.name.length<1){
-        res.status(400).json({"response":"The name field is empty!!!"});
-        return;
-    }
     moneyType.create({
         "name":req.body.name
     }).then(result=>{
@@ -39,32 +28,23 @@ exports.insertData=function(req,res){
     });
 }
 exports.updateData=function(req,res){
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }else if (typeof req.body.name === 'undefined') {
-        res.status(400).json({"response":"The request does not contain enough data to process!!!"});
-        return;
-    }else if(req.body.name.length<1){
-        res.status(400).json({"response":"The name field is empty!!!"});
-        return;
-    }
     moneyType.findByPk(req.params.id).then(moneyType=>{
+        if(moneyType==null){
+            res.status(404).json({"response":"This id not found from our databases!"});
+        }
         moneyType.name=req.body.name;
         return moneyType.save();
-        // moneyType.save().then.catch(); ===>>> also you can do that
     }).then(update_result=>{
         res.status(200).json({"response":"This data has been updated successfully!!!"});
     }).catch(err=>{
-        res.status(400).json({"response":err.errors[0].message});
+        res.status(422).json({"response":err.errors[0].message});
     });
 }
 exports.deleteData=function(req,res){
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }
     moneyType.findByPk(req.params.id).then(moneyType=>{
+        if(moneyType==null){
+            res.status(404).json({"response":"This id not found from our databases!"});
+        }
         return moneyType.destroy();
     }).then(deleted_result=>{
         res.status(200).json({"response":"This data has been deleted successfully!!!"});
