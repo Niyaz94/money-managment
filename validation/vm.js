@@ -1,4 +1,5 @@
 //validation middleware
+const {validationResult} = require('express-validator');
 
 module.exports.case1=(req, res, next) => {
     const errors = validationResult(req);

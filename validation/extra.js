@@ -1,5 +1,7 @@
 const {body,param} = require('express-validator');
 
+
+
 const check_name=(filed)=>{
     return body(filed)
     .exists().withMessage('The name field does not exist!')
@@ -19,7 +21,18 @@ const check_id=(filed)=>{
     .bail();
 }
 
+const check_exist=(module,filed)=>{
+    return body(filed).custom((value,{req})=>{
+        return module.findOne({where:{[filed]:value}}).then(new_module=>{
+            if(new_module){
+                return Promise.reject("This value is already exist!");
+            }
+        });
+    })
+}
+
 module.exports ={
     check_id:check_id,
-    check_name:check_name
+    check_name:check_name,
+    check_exist:check_exist
 }

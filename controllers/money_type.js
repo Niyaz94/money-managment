@@ -29,9 +29,6 @@ exports.insertData=function(req,res){
 }
 exports.updateData=function(req,res){
     moneyType.findByPk(req.params.id).then(moneyType=>{
-        if(moneyType==null){
-            res.status(404).json({"response":"This id not found from our databases!"});
-        }
         moneyType.name=req.body.name;
         return moneyType.save();
     }).then(update_result=>{
@@ -42,9 +39,6 @@ exports.updateData=function(req,res){
 }
 exports.deleteData=function(req,res){
     moneyType.findByPk(req.params.id).then(moneyType=>{
-        if(moneyType==null){
-            res.status(404).json({"response":"This id not found from our databases!"});
-        }
         return moneyType.destroy();
     }).then(deleted_result=>{
         res.status(200).json({"response":"This data has been deleted successfully!!!"});
