@@ -1,39 +1,37 @@
 const express               = require("express");
-
-const money_type=require("../validation/money_type");
+const validator             = require("../validation/money_type");
+const controller            = require("../controllers/money_type");
 
 const router = express.Router();
-
-
-
-const money_type_controller=require("../controllers/money_type");
 
 router.post("/",
     [
         require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-        money_type.insertValidateData
+        validator.insertValidateData
     ],
-    money_type_controller.insertData
+    controller.insertData
 );
-
-router.put(
-    "/:id",
+router.put("/:id",
     [
         require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-        money_type.updateValidateData
+        validator.updateValidateData
     ],
-    money_type_controller.updateData
+    controller.updateData
 );
-
-router.get("/:id",[
-    money_type.validateID
-],money_type_controller.getData);
-router.get("/",money_type_controller.getAllData);
-
-
-router.delete("/:id",[
-    money_type.validateID
-],money_type_controller.deleteData);
-
+router.get("/:id",
+    [
+        validator.validateID
+    ],
+    controller.getData
+);
+router.get("/",
+    controller.getAllData
+);
+router.delete("/:id",
+    [
+        validator.validateID
+    ],
+    controller.deleteData
+);
 
 module.exports=router;

@@ -1,10 +1,6 @@
 const expenseType=require("../models/expenseType");
 
 exports.getData=function(req,res){
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }
     expenseType.findByPk(req.params.id,{
         attributes: ['id','name','note',['created_at','datetime']]
     }).then(result=>{
@@ -13,7 +9,6 @@ exports.getData=function(req,res){
         res.status(400).json(err);
     }) 
 }
-
 exports.getAllData=function(req,res){
     expenseType.findAll({
         attributes: ['id','name','note',['created_at','datetime']]
@@ -23,15 +18,7 @@ exports.getAllData=function(req,res){
         res.status(400).json(err);
     })  
 }
-
 exports.insertData=function(req,res){
-    if (typeof req.body.name === 'undefined') {
-        res.status(400).json({"response":"The request does not contain enough data to process!!!"});
-        return;
-    }else if(req.body.name.length<1){
-        res.status(400).json({"response":"The name field is empty!!!"});
-        return;
-    }
     expenseType.create({
         "name":req.body.name,
         "note":req.body.note,
@@ -41,18 +28,7 @@ exports.insertData=function(req,res){
         res.status(400).json({"response":err.errors[0].message});
     });
 }
-
 exports.updateData=function(req,res){
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }else if (typeof req.body.name === 'undefined') {
-        res.status(400).json({"response":"The request does not contain enough data to process!!!"});
-        return;
-    }else if(req.body.name.length<1){
-        res.status(400).json({"response":"The name field is empty!!!"});
-        return;
-    }
     expenseType.findByPk(req.params.id).then(expenseType=>{
         return expenseType.update({
             "name":req.body.name,
@@ -64,12 +40,7 @@ exports.updateData=function(req,res){
         res.status(400).json({"response":err.errors[0].message});
     });
 }
-
 exports.deleteData=function(req,res){
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }
     expenseType.findByPk(req.params.id).then(expenseType=>{
         return expenseType.destroy();
     }).then(deleted_result=>{

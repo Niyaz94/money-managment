@@ -15,7 +15,7 @@ exports.insertValidateData = [
 ];
 exports.updateValidateData = [
     check_id("id"),
-    check_exist(moneyType,"id"),
+    check_exist(moneyType,"id","param","not_exist"),
     check_name("name"),
     check_exist(moneyType,"name"),
     case1

@@ -1,26 +1,37 @@
-const express =require("express");
+const express       = require("express");
+const validator     = require("../validation/expense_type");
+const controller    = require("../controllers/expense_type");
+
 const router = express.Router();
 
-
-const expense_type_controller=require("../controllers/expense_type");
-
-router.post(
-    "/",
-    require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-    expense_type_controller.insertData
+router.post("/",
+    [
+        require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
+        validator.insertValidateData
+    ],
+    controller.insertData
 );
-
-router.put(
-    "/:id",
-    require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-    expense_type_controller.updateData
+router.put("/:id",
+    [
+        require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
+        validator.updateValidateData
+    ],
+    controller.updateData
 );
-
-router.get("/:id",expense_type_controller.getData);
-router.get("/",expense_type_controller.getAllData);
-
-
-router.delete("/:id",expense_type_controller.deleteData);
-
-
+router.get("/:id",
+    [
+        validator.validateID
+    ],
+    controller.getData
+);
+router.get("/",
+    [],
+    controller.getAllData
+);
+router.delete("/:id",
+    [
+        validator.validateID
+    ],
+    controller.deleteData
+);
 module.exports=router;
