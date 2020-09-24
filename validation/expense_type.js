@@ -5,20 +5,20 @@ const {case1}=require("./vm");
 
 exports.validateID = [
     check_id("id"),
-    check_exist(expenseType,"id","param","not_exist"),
+    check_exist(expenseType,"id","id","param","not_exist"),
     case1
 ];
 exports.insertValidateData = [
     check_text("note"),
     check_name("name"),
-    check_exist(expenseType,"name"),
+    check_exist(expenseType,"name","name"),
     case1
 ];
 exports.updateValidateData = [
     check_text("note"),
     check_id("id"),
-    check_exist(expenseType,"id","param","not_exist"),
+    check_exist(expenseType,"id","id","param","not_exist"),
     check_name("name"),
-    check_exist(expenseType,"name"),
+    check_exist(expenseType,"name","name"),
     case1
 ];

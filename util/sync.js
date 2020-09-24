@@ -21,34 +21,33 @@ module.exports=()=>{
     capital.belongsTo(capitalType);
 
     moneyType.hasOne(expense, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'RESTRICT'
-      });
-      expense.belongsTo(moneyType);
+      onDelete: 'RESTRICT',
+      onUpdate: 'RESTRICT'
+    });
+    expense.belongsTo(moneyType);
       
-      expenseType.hasOne(expense, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'RESTRICT'
-      });
-      expense.belongsTo(expenseType);
+    expenseType.hasOne(expense, {
+      onDelete: 'RESTRICT',
+      onUpdate: 'RESTRICT'
+    });
+    expense.belongsTo(expenseType);
       
-      
-      moneyType.hasOne(income, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'RESTRICT'
-      });
-      income.belongsTo(moneyType);
-      
-      incomeType.hasOne(income, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'RESTRICT'
-      });
-      income.belongsTo(incomeType);
+    moneyType.hasOne(income, {
+      onDelete: 'RESTRICT',
+      onUpdate: 'RESTRICT'
+    });
+    income.belongsTo(moneyType);
+    
+    incomeType.hasOne(income, {
+      onDelete: 'RESTRICT',
+      onUpdate: 'RESTRICT'
+    });
+    income.belongsTo(incomeType);
 
       sequelize.sync(/*{ force: true }*/).then(result=>{
         //console.log(result);
       }).catch(err=>{
         console.log(err);
       });
-      //moneyType.sync({ force: true });
+      //capital.sync({ force: true });
 }

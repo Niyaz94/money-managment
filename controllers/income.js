@@ -9,44 +9,7 @@ const check=require("../util/check");
 const needs=require("../util/needs");
 const capital_operations=require("../util/capital_operations");
 
-
-const income_row=async (id=0)=>{
-    const query=`
-        SELECT
-            income.id,
-            money_type_fid,
-            money_type.name as 'money_type',
-            income_type.name as 'income_type',
-            amount,
-            date,
-            income.note
-        FROM
-            income,
-            money_type,
-            income_type
-        WHERE
-            income.id=? AND
-            income.deleted_at is null AND    
-            money_type.deleted_at is null AND    
-            income_type.deleted_at is null AND
-            money_type.id=money_type_fid AND
-            income_type.id=income_type_fid
-    
-    `;
-    let data={};
-    await exec(query,[id],1)().then(result=>{
-        if(needs.is_set(result)){
-            data=result;
-        }
-    }).catch(function(err){
-    }) 
-    return data;
-}
 exports.getData=(req,res)=>{
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }
     income.findByPk(req.params.id,{
         include:[
             {
@@ -93,22 +56,6 @@ exports.getAllData=function(req,res){
     })   
 }
 exports.insertData=async function(req,res){
-    if (typeof req.body.date === 'undefined' || typeof req.body.amount === 'undefined' || typeof req.body.incomeTypeFid === 'undefined' || typeof req.body.moneyTypeFid === 'undefined') {
-        res.status(400).json({"response":"The request does not contain enough data to process!!!"});
-        return;
-    }else if(!needs.isDate(req.body.date)){
-        res.status(400).json({"response":"The date field should has this format [ YYYY-MM-DD ] !!!"});
-        return;
-    }else if(isNaN(req.body.incomeTypeFid) || (await check.checkIncomeType(req.body.incomeTypeFid))!=1){
-        res.status(400).json({"response":"The incomeTypeFid field should be number && exist in the Database !!!"});
-        return;
-    }else if(isNaN(req.body.moneyTypeFid) || (await check.checkMoneyType(req.body.moneyTypeFid))!=1){
-        res.status(400).json({"response":"The moneyTypeFid field should be number && exist in the Database !!!"});
-        return;
-    }else if(isNaN(req.body.amount) || req.body.amount<=0){
-        res.status(400).json({"response":"The amount field should be number && bigger than zero !!!"});
-        return;
-    }
     income.create({
         "amount":req.body.amount,
         "date":req.body.date,
@@ -126,34 +73,12 @@ exports.insertData=async function(req,res){
         }).catch(err=>{
             res.status(400).json({"response":err.errors[0].message});
         });
-
         res.status(200).json({"response":`The new row has been added with id ${new_income.id}`});
     }).catch(err=>{
         res.status(400).json({"response":err.errors[0].message});
     });
 }
-
 exports.updateData=async function(req,res){
-
-    if (typeof req.body.date === 'undefined' || typeof req.body.amount === 'undefined' || typeof req.body.incomeTypeFid === 'undefined' || typeof req.body.moneyTypeFid === 'undefined') {
-        res.status(400).json({"response":"The request does not contain enough data to process!!!"});
-        return;
-    }else if(!needs.isDate(req.body.date)){
-        res.status(400).json({"response":"The date field should has this format [ YYYY-MM-DD ] !!!"});
-        return;
-    }else if(isNaN(req.body.incomeTypeFid) || (await check.checkIncomeType(req.body.incomeTypeFid))!=1){
-        res.status(400).json({"response":"The incomeTypeFid field should be number && exist in the Database !!!"});
-        return;
-    }else if(isNaN(req.body.moneyTypeFid) || (await check.checkMoneyType(req.body.moneyTypeFid))!=1){
-        res.status(400).json({"response":"The moneyTypeFid field should be number && exist in the Database !!!"});
-        return;
-    }else if(isNaN(req.body.amount) || req.body.amount<=0){
-        res.status(400).json({"response":"The amount field should be number && bigger than zero !!!"});
-        return;
-    }else if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }
     try {
         previous_income=await income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['name']}});
         if(previous_income===null){
@@ -166,7 +91,6 @@ exports.updateData=async function(req,res){
                 res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
                 return;
             }
-            console.log(previous_income);
             const compare_money=capital_operations.calculatte_remain_money(previous_income.amount,req.body.amount,"income");
             if(compare_money[0]!=0){
                 capital.create({
@@ -210,10 +134,6 @@ exports.updateData=async function(req,res){
     }
 }
 exports.deleteData=async function(req,res){
-    if(isNaN(req.params.id) || req.params.id <1){
-        res.status(400).json({"response":"The coming data uncorrect!!!"});
-        return;
-    }
     income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['name']}}).then(async result=>{
         if(!(await capital_operations.has_money_in_capital(result.amount,result.moneyType.name))){
             res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});

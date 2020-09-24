@@ -21,7 +21,7 @@ const capital=sequelize.define('capital',{
         }
     },
     date: { 
-        type: DataTypes.DATE, 
+        type: DataTypes.DATEONLY, 
         allowNull:false,
         defaultValue: DataTypes.NOW ,
         validate:{
