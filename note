@@ -1,4 +1,4 @@
-1 - validation                          ===>>>
+1 - validation                          ===>>> done
 2 - authentication                      ===>>>
 3 - production version                  ===>>>
 4 - file for collecting errors          ===>>>
@@ -6,7 +6,7 @@
 6 - saving images                       ===>>>
 7 - socket.io                           ===>>>
 8 - security                            ===>>>
-9 - return one row for getOne           ===>>>
+9 - return one row for getOne           ===>>> done
 10- working with files                  ===>>>
 10- testing                             ===>>>
 11- permission                          ===>>>
@@ -14,3 +14,4 @@
 13- stop deleting static capital_type   ===>>>
 14- using sequalize                     ===>>>
 15- make all the js files OOP           ===>>>
+16- creating report pages               ===>>>

@@ -42,8 +42,11 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  //res.status(err.status || 500).send("<h1> The Page not found</h1>");
+
+  res.status(400).json({"response":"You are lose becuase this page not found!!!"});
+
+  //res.render('error');
 });
 //syncronizing with database
 db_sync();

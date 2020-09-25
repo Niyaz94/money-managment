@@ -13,9 +13,9 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/bin/www",
-            //"restart": true,
-            //"runtimeExecutable": "nodemon",
-            //"console": "integratedTerminal"
+            "restart": true,
+            "runtimeExecutable": "nodemon",
+            "console": "integratedTerminal"
         }
     ]
 }

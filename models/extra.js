@@ -1,10 +1,10 @@
 const sequelize =require('../util/database');
 const { QueryTypes } =require("sequelize");
 
-module.exports.current_total=async (row_type="all")=>{
-    row_type=row_type.toLowerCase();
+module.exports.current_total=async (row_type=0)=>{
     const query=`
         SELECT
+        	moneyTypes.id as id,
         	moneyTypes.name as name,
             SUM(
                 IF(
@@ -38,14 +38,13 @@ module.exports.current_total=async (row_type="all")=>{
         type: QueryTypes.SELECT //without this line it is not working perfectly
     })
     .then(result=>{
-        data=row_type=="all"?result:result.filter(row=>row["name"]==row_type)[0];
+        data=row_type==0?result:result.filter(row=>Number(row["id"])==row_type)[0];
     }).catch(function(err){
     }) 
     return data;
 }
 
 module.exports.current_total2=async (row_type="all")=>{
-    row_type=row_type.toLowerCase();
     const query=`
         SELECT
         	moneyTypes.name as name,

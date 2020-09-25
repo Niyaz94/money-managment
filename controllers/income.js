@@ -80,14 +80,10 @@ exports.insertData=async function(req,res){
 }
 exports.updateData=async function(req,res){
     try {
-        previous_income=await income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['name']}});
-        if(previous_income===null){
-            res.status(400).json({"response":"There are no income with this id!!!"});
-            return res.end();
-        }
+        previous_income=await income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}});
         //if they are the same currency
         if(previous_income.moneyTypeId===req.body.moneyTypeFid){
-            if((compare_amount=capital_operations.find_remain_money(previous_income.amount,req.body.amount,"push"))>0 && !(await capital_operations.has_money_in_capital(compare_amount,previous_income.moneyType.name))){
+            if((compare_amount=capital_operations.find_remain_money(previous_income.amount,req.body.amount,"push"))>0 && !(await capital_operations.has_money_in_capital(compare_amount,previous_income.moneyType.id))){
                 res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
                 return;
             }
@@ -101,7 +97,7 @@ exports.updateData=async function(req,res){
                 });
             }
         }else{//if it is different currency
-            if(!(await capital_operations.has_money_in_capital(previous_income.amount,money_type))){
+            if(!(await capital_operations.has_money_in_capital(previous_income.amount,previous_income.moneyType.id))){
                 res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
                 return;
             }
@@ -134,8 +130,8 @@ exports.updateData=async function(req,res){
     }
 }
 exports.deleteData=async function(req,res){
-    income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['name']}}).then(async result=>{
-        if(!(await capital_operations.has_money_in_capital(result.amount,result.moneyType.name))){
+    income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}}).then(async result=>{
+        if(!(await capital_operations.has_money_in_capital(result.amount,result.moneyType.id))){
             res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
         }else{
             capital.create({
