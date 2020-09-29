@@ -1,8 +1,6 @@
 const moment        = require("moment");
-
-const income        = require("../models/income");
 const capital       = require("../models/capital");
-const incomeType    = require("../models/incomeType");
+const capitalType    = require("../models/capitalType");
 const moneyType     = require("../models/moneyType");
 
 const capital_operations=require("../util/capital_operations");
@@ -54,7 +52,8 @@ exports.getAllData=function(req,res){
     })   
 }
 exports.insertData=async function(req,res){
-    income.create({
+    return res.end();
+    /*income.create({
         "amount":req.body.amount,
         "date":req.body.date,
         "note":req.body.note
@@ -74,7 +73,7 @@ exports.insertData=async function(req,res){
         res.status(200).json({"response":`The new row has been added with id ${new_income.id}`});
     }).catch(err=>{
         res.status(400).json({"response":err.errors[0].message});
-    });
+    });*/
 }
 exports.updateData=async function(req,res){
     try {

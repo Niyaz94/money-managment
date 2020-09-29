@@ -1,29 +1,29 @@
 const moment        = require("moment");
 
-const income        = require("../models/income");
+const exchange        = require("../models/exchange");
 const capital       = require("../models/capital");
-const incomeType    = require("../models/incomeType");
 const moneyType     = require("../models/moneyType");
-
 const capital_operations=require("../util/capital_operations");
 
 exports.getData=(req,res)=>{
-    income.findByPk(req.params.id,{
+    exchange.findByPk(req.params.id,{
         include:[
             {
                 model:moneyType,
+                as:'sellMoneyType',
                 attributes: ['id','name'],
                 where:{},
                 order:[]
             },
             {
-                model:incomeType,
+                model:moneyType,
                 attributes: ['id','name'],
+                as:'buyMoneyType',
                 where:{},
                 order:[]
             }
         ],
-        attributes: ['id','amount','date','note',['created_at','datetime']]
+        attributes: ['id','sellAmount','buyAmount','date','note',['created_at','datetime']]
     }).then(result=>{
         res.status(result==null?400:200).json(result==null?{"response":"This row not found!!!"}:result);
     }).catch(err=>{
@@ -31,22 +31,24 @@ exports.getData=(req,res)=>{
     }) 
 }
 exports.getAllData=function(req,res){
-    income.findAll({
+    exchange.findAll({
         include:[
             {
                 model:moneyType,
+                as:'sellMoneyType',
                 attributes: ['id','name'],
                 where:{},
                 order:[]
             },
             {
-                model:incomeType,
+                model:moneyType,
+                as:'buyMoneyType',
                 attributes: ['id','name'],
                 where:{},
                 order:[]
             }
         ],
-        attributes: ['id','amount','date','note',['created_at','datetime']]
+        attributes: ['id','sellAmount','buyAmount','date','note',['created_at','datetime']]
     }).then(result=>{
         res.status(200).json(result);
     }).catch(err=>{
@@ -54,27 +56,36 @@ exports.getAllData=function(req,res){
     })   
 }
 exports.insertData=async function(req,res){
-    income.create({
-        "amount":req.body.amount,
-        "date":req.body.date,
-        "note":req.body.note
-    }).then(new_income=>{
-        new_income.setMoneyType(req.body.moneyTypeFid);
-        new_income.setIncomeType(req.body.incomeTypeFid);
-        capital.create({
-            "amount":req.body.amount,
+    if(!(await capital_operations.has_money_in_capital(req.body.sellAmount,req.body.sellMoneyTypeId))){
+        res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
+    }else{
+        exchange.create({
+            "sellAmount":req.body.sellAmount,
+            "buyAmount":req.body.buyAmount,
             "date":req.body.date,
-            "note":req.body.note
-        }).then(new_capital=>{
-            new_capital.setMoneyType(req.body.moneyTypeFid);
-            new_capital.setCapitalType(1);
+            "note":req.body.note,
+            "buyMoneyTypeId":req.body.buyMoneyTypeId,
+            "sellMoneyTypeId":req.body.sellMoneyTypeId
+        }).then(new_exchange=>{
+            capital.create({
+                "amount":req.body.buyAmount,
+                "date":req.body.date,
+                "note":req.body.note,
+                "moneyTypeId":req.body.buyMoneyTypeId,
+                "capitalTypeId":3
+            });
+            capital.create({
+                "amount":req.body.sellAmount,
+                "date":req.body.date,
+                "note":req.body.note,
+                "moneyTypeId":req.body.sellMoneyTypeId,
+                "capitalTypeId":4
+            })
+            res.status(200).json({"response":`The new row has been added with id ${new_exchange.id}`});
         }).catch(err=>{
             res.status(400).json({"response":err.errors[0].message});
         });
-        res.status(200).json({"response":`The new row has been added with id ${new_income.id}`});
-    }).catch(err=>{
-        res.status(400).json({"response":err.errors[0].message});
-    });
+    }
 }
 exports.updateData=async function(req,res){
     try {

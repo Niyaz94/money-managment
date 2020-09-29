@@ -13,7 +13,7 @@ const expenseType=sequelize.define('expenseType',{
         unique: true,
         allowNull:false,
         validate:{
-            len: [3,20],
+            len: [3,30],
             notNull: true,            // won't allow null
             notEmpty: true,           // don't allow empty strings
         }

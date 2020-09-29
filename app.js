@@ -6,7 +6,7 @@ const bodyParser    = require('body-parser');
 const multer        = require("multer");
 const logger        = require('morgan');
 
-const db_sync       = require("./util/sync");
+const db_sync       = require("./models/sync");
 
 var app = express();
 // view engine setup

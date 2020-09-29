@@ -5,5 +5,7 @@ module.exports.set_route = function(app) {
     app.use('/capitaltype',[],require('./routes/capital_type'));
     app.use('/expense',[],require('./routes/expense'));
     app.use('/income',[],require('./routes/income'));
+    app.use('/exchange',[],require('./routes/exchange'));
+    app.use('/capital',[],require('./routes/capital'));
 }
  

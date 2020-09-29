@@ -19,7 +19,7 @@ const capitalType=sequelize.define('capitalType',{
             this.setDataValue('name',value.toLowerCase());
         },
         validate:{
-            len: [3,10],
+            len: [3,20],
             notNull: true,            // won't allow null
             notEmpty: true,           // don't allow empty strings
         }

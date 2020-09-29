@@ -1,5 +1,4 @@
-const { Sequelize, DataTypes } =require("sequelize");
-
+const { Sequelize } =require("sequelize");
 
 const sequelize = new Sequelize(
     "money_management",
@@ -19,5 +18,4 @@ const sequelize = new Sequelize(
       },
     }
 );
-
 module.exports = sequelize; 
