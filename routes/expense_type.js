@@ -6,14 +6,12 @@ const router = express.Router();
 
 router.post("/",
     [
-        require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
         validator.insertValidateData
     ],
     controller.insertData
 );
 router.put("/:id",
     [
-        require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
         validator.updateValidateData
     ],
     controller.updateData

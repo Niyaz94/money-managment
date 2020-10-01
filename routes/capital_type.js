@@ -1,26 +1,37 @@
-const express =require("express");
+const express       = require("express");
+const validator     = require("../validation/capital_type");
+const controller    = require("../controllers/capital_type");
+
 const router = express.Router();
 
-
-const capital_type_controller=require("../controllers/capital_type");
-
-router.post(
-    "/",
-    require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-    capital_type_controller.insertData
+router.post("/",
+    [
+        validator.insertValidateData
+    ],
+    controller.insertData
 );
-
-router.put(
-    "/:id",
-    require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
-    capital_type_controller.updateData
+router.put("/:id",
+    [
+        validator.updateValidateData
+    ],
+    controller.updateData
 );
+router.get("/:id",
+    [
+        validator.validateID
+    ],
+    controller.getData
+);
+router.get("/",
+    [
 
-router.get("/:id",capital_type_controller.getData);
-router.get("/",capital_type_controller.getAllData);
-
-
-router.delete("/:id",capital_type_controller.deleteData);
-
-
+    ],
+    controller.getAllData
+);
+router.delete("/:id",
+    [
+        validator.validateID
+    ],
+    controller.deleteData
+);
 module.exports=router;

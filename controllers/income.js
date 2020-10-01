@@ -5,7 +5,8 @@ const capital       = require("../models/capital");
 const incomeType    = require("../models/incomeType");
 const moneyType     = require("../models/moneyType");
 
-const capital_operations=require("../util/capital_operations");
+const capitalCalculation   = require("../validation/calculation/capital").capitalCalculation;
+
 
 exports.getData=(req,res)=>{
     income.findByPk(req.params.id,{
@@ -81,21 +82,21 @@ exports.updateData=async function(req,res){
         previous_income=await income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}});
         //if they are the same currency
         if(previous_income.moneyTypeId===req.body.moneyTypeFid){
-            if((compare_amount=capital_operations.find_remain_money(previous_income.amount,req.body.amount,"push"))>0 && !(await capital_operations.has_money_in_capital(compare_amount,previous_income.moneyType.id))){
+            if((compare_amount=new capitalCalculation().findMoney(previous_income.amount,req.body.amount,"push"))>0 && !(await new capitalCalculation().is_available(compare_amount,previous_income.moneyType.id))){
                 res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
                 return;
             }
-            const compare_money=capital_operations.calculatte_remain_money(previous_income.amount,req.body.amount,"income");
-            if(compare_money[0]!=0){
+            const compare_money=new capitalCalculation().calculatedMoney(previous_income.amount,req.body.amount,"push");
+            if(compare_money[0]!="none"){
                 capital.create({
                     "amount":compare_money[1],
                     "date":moment().format("YYYY-MM-DD"),
                     "moneyTypeId":previous_income.moneyTypeId,
-                    "capitalTypeId":compare_money[0]
+                    "capitalTypeId":(compare_money[0]=="push"?1:2)
                 });
             }
         }else{//if it is different currency
-            if(!(await capital_operations.has_money_in_capital(previous_income.amount,previous_income.moneyType.id))){
+            if(!(await new capitalCalculation().is_available(previous_income.amount,previous_income.moneyType.id))){
                 res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
                 return;
             }
@@ -129,7 +130,7 @@ exports.updateData=async function(req,res){
 }
 exports.deleteData=async function(req,res){
     income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}}).then(async result=>{
-        if(!(await capital_operations.has_money_in_capital(result.amount,result.moneyType.id))){
+        if(!(await new capitalCalculation().is_available(result.amount,result.moneyType.id))){
             res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
         }else{
             capital.create({

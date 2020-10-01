@@ -7,7 +7,6 @@ const router = express.Router();
 router.route("/")
     .post(
         [
-            require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
             validator.insertValidateData
         ],
         controller.insertData
@@ -23,7 +22,6 @@ router.route("/:id")
         controller.getData
     ).put(
         [
-            require("../middleware/general/check_requist_content_type").check_requist_content_type("json"),
             validator.updateValidateData
         ],
         controller.updateData

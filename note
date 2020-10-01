@@ -1,21 +1,12 @@
-1 - validation                                      ===>>> done
-2 - authentication                                  ===>>>
-3 - production version                              ===>>>
-4 - file for collecting errors                      ===>>>
-5 - returning from files                            ===>>>
-6 - saving images                                   ===>>>
-7 - socket.io                                       ===>>>
-8 - security                                        ===>>>
-9 - return one row for getOne                       ===>>> done
-10- working with files                              ===>>>
-10- testing                                         ===>>>
-11- permission                                      ===>>>
-12- pagination                                      ===>>>
-13- stop deleting static capital_type               ===>>>
-14- using sequalize                                 ===>>>
-15- make all the js files OOP                       ===>>>
-16- creating report pages                           ===>>>
-17- remove capital_operation                        ===>>>
-18- put remain validations inside validation folder ===>>>
-19- using classes with nodejs                       ===>>>
-20- fixing debag issue                              ===>>>
+1 - returning from files                            ===>>>
+2 - socket.io                                       ===>>>
+3 - security                                        ===>>>
+4 - working with files                              ===>>>
+5 - permission                                      ===>>>
+6 - pagination                                      ===>>>
+7 - make all the js files OOP                       ===>>>
+8 - creating report pages                           ===>>>
+9 - using classes with nodejs                       ===>>>
+10- fixing debag issue                              ===>>>
+11-understanding more about promises                ===>>>
+12- adding some needed middleware to the project    ===>>>

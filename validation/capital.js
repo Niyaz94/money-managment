@@ -3,7 +3,7 @@ const moneyType     = require("../models/moneyType");
 const capital       = require("../models/capital");
 
 
-const {check_id,check_capital_type,check_exist,check_text2,check_date,check_int,check_float}=require("./extra");
+const {check_id,check_exist,check_text2,check_date,check_int,check_float}=require("./extra");
 const {case1}=require("./vm");
 
 exports.validateID = [
@@ -19,7 +19,6 @@ exports.insertValidateData = [
     check_int("moneyTypeFid",1,1000),
     check_exist(moneyType,"id","moneyTypeFid","body","not_exist"),
     check_float("amount"),
-    check_capital_type("capitalTypeFid"),
     case1
 ];
 exports.updateValidateData = [

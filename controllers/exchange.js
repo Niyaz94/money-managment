@@ -1,9 +1,8 @@
-const moment        = require("moment");
-
-const exchange        = require("../models/exchange");
-const capital       = require("../models/capital");
-const moneyType     = require("../models/moneyType");
-const capital_operations=require("../util/capital_operations");
+const moment                = require("moment");
+const exchange              = require("../models/exchange");
+const capital               = require("../models/capital");
+const moneyType             = require("../models/moneyType");
+const capitalCalculation    = require("../validation/calculation/capital").capitalCalculation;
 
 exports.getData=(req,res)=>{
     exchange.findByPk(req.params.id,{
@@ -56,7 +55,7 @@ exports.getAllData=function(req,res){
     })   
 }
 exports.insertData=async function(req,res){
-    if(!(await capital_operations.has_money_in_capital(req.body.sellAmount,req.body.sellMoneyTypeId))){
+    if(!(await new capitalCalculation().is_available(req.body.sellAmount,req.body.sellMoneyTypeId))){
         res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
     }else{
         exchange.create({
@@ -87,72 +86,53 @@ exports.insertData=async function(req,res){
         });
     }
 }
-exports.updateData=async function(req,res){
-    try {
-        previous_income=await income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}});
-        //if they are the same currency
-        if(previous_income.moneyTypeId===req.body.moneyTypeFid){
-            if((compare_amount=capital_operations.find_remain_money(previous_income.amount,req.body.amount,"push"))>0 && !(await capital_operations.has_money_in_capital(compare_amount,previous_income.moneyType.id))){
-                res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-                return;
-            }
-            const compare_money=capital_operations.calculatte_remain_money(previous_income.amount,req.body.amount,"income");
-            if(compare_money[0]!=0){
-                capital.create({
-                    "amount":compare_money[1],
-                    "date":moment().format("YYYY-MM-DD"),
-                    "moneyTypeId":previous_income.moneyTypeId,
-                    "capitalTypeId":compare_money[0]
-                });
-            }
-        }else{//if it is different currency
-            if(!(await capital_operations.has_money_in_capital(previous_income.amount,previous_income.moneyType.id))){
-                res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-                return;
-            }
-            capital.bulkCreate([{
-                "amount":previous_income.amount,
-                "date":moment().format("YYYY-MM-DD"),
-                "moneyTypeId":previous_income.moneyTypeId,
-                "capitalTypeId":2
-            },{
-                "amount":Number(req.body.amount),
-                "date":moment().format("YYYY-MM-DD"),
-                "moneyTypeId":req.body.moneyTypeFid,
-                "capitalTypeId":1
-            }]);
-        }
-        try{
-            await previous_income.update({
-                "moneyTypeId":req.body.moneyTypeFid,
-                "incomeTypeId":req.body.incomeTypeFid,
-                "amount":req.body.amount,
-                "date":req.body.date,
-                "note":req.body.note
-            });
-            res.status(200).json({"response":"This data has been updated successfully!!!"});
-        }catch(err){
-            res.status(400).json("There is something wrong with updating income");
-        }
-    }catch(err){
-        res.status(400).json({"response":"There is something wrong with check data!!!"});
-    }
-}
-exports.deleteData=async function(req,res){
-    income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}}).then(async result=>{
-        if(!(await capital_operations.has_money_in_capital(result.amount,result.moneyType.id))){
+exports.updateData=async function(req,res){  
+    exchange.findByPk(req.params.id).then(async old_exchange=>{
+        if(!(await new capitalCalculation().exchange_update(req.params.id,req.body))){
             res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
         }else{
-            capital.create({
-                "amount":result.amount,
-                "date":moment().format("YYYY-MM-DD"),
-                "moneyTypeId":result.moneyTypeId,
-                "capitalTypeId":2
-            });
-            result.destroy();
-            res.status(200).json({"response":"This data has been deleted successfully!!!"});
+            //capital.bulkCreate([{
+            //    "amount":old_exchange.sellAmount,
+            //    "date":moment().format("YYYY-MM-DD"),
+            //    "moneyTypeId":old_exchange.sellMoneyTypeId,
+            //    "capitalTypeId":3
+            //},{
+            //    "amount":old_exchange.buyAmount,
+            //    "date":moment().format("YYYY-MM-DD"),
+            //    "moneyTypeId":old_exchange.buyMoneyTypeId,
+            //    "capitalTypeId":4
+            //}]);
         }
+        return old_exchange.update({
+
+        });
+    }).then(edit_exchange=>{
+        res.status(200).json({"response":"This data has been updated successfully!!!"});
     }).catch(err=>{
-        res.status(400).json({"response":"There are no income with this id!!!"});
+        res.status(400).json({"response":"The Data not found in the database!!!"});
+    });
+}
+exports.deleteData=async function(req,res){
+    exchange.findByPk(req.params.id).then(async old_exchange=>{
+        if(!(await new capitalCalculation().is_available(old_exchange.buyAmount,old_exchange.buyMoneyTypeId))){
+            res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
+        }else{
+            capital.bulkCreate([{
+                "amount":old_exchange.sellAmount,
+                "date":moment().format("YYYY-MM-DD"),
+                "moneyTypeId":old_exchange.sellMoneyTypeId,
+                "capitalTypeId":3
+            },{
+                "amount":old_exchange.buyAmount,
+                "date":moment().format("YYYY-MM-DD"),
+                "moneyTypeId":old_exchange.buyMoneyTypeId,
+                "capitalTypeId":4
+            }]);
+        }
+        return old_exchange.destroy();
+    }).then(deleted_exchange=>{
+        res.status(200).json({"response":"This data has been deleted successfully!!!"});
+    }).catch(err=>{
+        res.status(400).json({"response":"The Data not found in the database!!!"});
     });
 }

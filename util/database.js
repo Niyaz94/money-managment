@@ -1,7 +1,8 @@
 const { Sequelize } =require("sequelize");
 
 const sequelize = new Sequelize(
-    "money_management",
+    //"money_management",
+    "test",
     "local_admin",
     "61#2d2A2j51^_4",
     {

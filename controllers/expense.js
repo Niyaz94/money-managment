@@ -4,7 +4,7 @@ const expense               = require("../models/expense");
 const capital               = require("../models/capital");
 const expenseType           = require("../models/expenseType");
 const moneyType             = require("../models/moneyType");
-const capital_operations    = require("../util/capital_operations");
+const capitalCalculation           = require("../validation/calculation/capital").capitalCalculation;
 
 exports.getData=(req,res)=>{
     expense.findByPk(req.params.id,{
@@ -53,7 +53,7 @@ exports.getAllData=function(req,res){
     })   
 }
 exports.insertData=async function(req,res){
-    if(!(await capital_operations.has_money_in_capital(req.body.amount,req.body.moneyTypeFid))){
+    if(!(await new capitalCalculation().is_available(req.body.amount,req.body.moneyTypeFid))){
         res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
     }else{
         expense.create({
@@ -84,21 +84,21 @@ exports.updateData=async function(req,res){
         previous_expense=await expense.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}});
         //if they are the same currency
         if(previous_expense.moneyTypeId===req.body.moneyTypeFid){
-            if((compare_amount=capital_operations.find_remain_money(previous_expense.amount,req.body.amount,"pull"))>0 && !(await capital_operations.has_money_in_capital(compare_amount,previous_expense.moneyType.id))){
+            if((compare_amount=new capitalCalculation().findMoney(previous_expense.amount,req.body.amount,"pull"))>0 && !(await new capitalCalculation().is_available(compare_amount,previous_expense.moneyType.id))){
                 res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
                 return;
             }
-            const compare_money=capital_operations.calculatte_remain_money(previous_expense.amount,req.body.amount,"expense");
-            if(compare_money[0]!=0){
+            const compare_money=new capitalCalculation().calculatedMoney(previous_expense.amount,req.body.amount,"pull");
+            if(compare_money[0]!="none"){
                 capital.create({
                     "amount":compare_money[1],
                     "date":moment().format("YYYY-MM-DD"),
                     "moneyTypeId":previous_expense.moneyTypeId,
-                    "capitalTypeId":compare_money[0]
+                    "capitalTypeId":(compare_money[0]=="pull"?2:1)
                 });
             }
         }else{//if it is different currency
-            if(!(await capital_operations.has_money_in_capital(req.body.amount,req.body.moneyTypeFid))){
+            if(!(await new capitalCalculation().is_available(req.body.amount,req.body.moneyTypeFid))){
                 res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
                 return;
             }

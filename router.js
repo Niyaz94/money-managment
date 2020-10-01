@@ -1,4 +1,9 @@
 module.exports.set_route = function(app) {
+    app.post('*',
+      require("./middleware/contentType").check("json"),
+    ).put('*',
+      require("./middleware/contentType").check("json"),
+    );
     app.use('/moneytype',[],require('./routes/money_type'));
     app.use('/expensetype',[],require('./routes/expense_type'));
     app.use('/incometype',[],require('./routes/income_type'));
