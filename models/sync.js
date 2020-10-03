@@ -7,6 +7,7 @@ const capital           =require('./capital');
 const income            =require('./income');
 const exchange          =require('./exchange');
 const expense           =require('./expense');
+const property           =require('./property');
 
 module.exports=()=>{
 
@@ -56,6 +57,12 @@ module.exports=()=>{
   });
   capital.belongsTo(capitalType);
 
+  moneyType.hasOne(property, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT'
+  });
+  property.belongsTo(moneyType);
+
   moneyType.hasOne(expense, {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT'
@@ -86,4 +93,6 @@ module.exports=()=>{
     console.log(err);
   });
   //exchange.sync({ force: true });
+  //property.sync({ alter: true });
+
 }

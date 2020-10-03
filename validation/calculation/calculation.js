@@ -11,6 +11,8 @@ class calculation{
         return (Number(push_money)-Number(pull_money))>=Number(amount)?true:false;
     }
     findMoney(old_money,new_money,type){
+        old_money=Number(old_money);
+        new_money=Number(new_money);
         if(type=="push" && old_money>new_money){//usually mean income
             return old_money-new_money;
         }else if(type=="pull" && old_money<new_money){//usually mean expense
@@ -20,19 +22,21 @@ class calculation{
         }
     }
     calculatedMoney(old_money,new_money,type){
+        old_money=Number(old_money);
+        new_money=Number(new_money);
         if(type=="push"){//usually mean income
             if(old_money>new_money){
-                return ["pull",(Number(old_money)-Number(new_money))];
+                return ["pull",(old_money-new_money)];
             }else if(old_money<new_money){
-                return ["push",(Number(new_money)-Number(old_money))];
+                return ["push",(new_money-old_money)];
             }else{
                 return ["none",0];
             }
         }else if(type=="pull"){//usually mean expense
             if(old_money>=new_money){
-                return ["push",(Number(old_money)-Number(new_money))];
+                return ["push",(old_money-new_money)];
             }else if(old_money<new_money){
-                return ["pull",(Number(new_money)-Number(old_money))];
+                return ["pull",(new_money-old_money)];
             }else{
                 return ["none",0];
             }

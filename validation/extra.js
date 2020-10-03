@@ -1,10 +1,6 @@
 const {body,param}  = require('express-validator');
 const {Op}          = require("sequelize");
 
-const capitalType   = require("../models/capitalType");
-const calculation   = require("./calculation/calculation");
-
-
 const check_name=(field)=>{
     return body(field)
                 .exists().withMessage('The name field does not exist!')
@@ -68,6 +64,17 @@ const check_int=(field,min=0,max=1000000000)=>{
                 .not().isEmpty().withMessage('The name can not be empty!')
                 .isInt(extra).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`)
                 .bail();
+}
+const check_in=(field,values)=>{
+    return body(field)
+                .exists().withMessage('The name field does not exist!')
+                .isAlpha().withMessage('Should contains only letters!')
+                .trim()
+                .escape()
+                .not().isEmpty().withMessage('The name can not be empty!')
+                .isIn(values).withMessage(`The value should be one of those value (${values.join(", ")}) !`)
+                .bail();
+
 }
 /*
     it check for id usually from the url check it if it is number above zero or not
@@ -161,5 +168,6 @@ module.exports ={
     check_int:check_int,
     check_date:check_date,
     check_float:check_float,
-    check_equality:check_equality
+    check_equality:check_equality,
+    check_in:check_in
 }

@@ -1,10 +1,9 @@
-const moment        = require("moment");
-
-const income        = require("../models/income");
-const capital       = require("../models/capital");
-const incomeType    = require("../models/incomeType");
-const moneyType     = require("../models/moneyType");
-
+const moment               = require("moment");
+const income               = require("../models/income");
+const capital              = require("../models/capital");
+const incomeType           = require("../models/incomeType");
+const moneyType            = require("../models/moneyType");
+const messages             = require("../util/message");
 const capitalCalculation   = require("../validation/calculation/capital").capitalCalculation;
 
 
@@ -26,9 +25,9 @@ exports.getData=(req,res)=>{
         ],
         attributes: ['id','amount','date','note',['created_at','datetime']]
     }).then(result=>{
-        res.status(result==null?400:200).json(result==null?{"response":"This row not found!!!"}:result);
+        return res.status(result==null?400:200).json(result==null?{"response":"This row not found!!!"}:result);
     }).catch(err=>{
-        res.status(400).json(err);
+        return res.status(400).json(err);
     }) 
 }
 exports.getAllData=function(req,res){
@@ -49,9 +48,9 @@ exports.getAllData=function(req,res){
         ],
         attributes: ['id','amount','date','note',['created_at','datetime']]
     }).then(result=>{
-        res.status(200).json(result);
+        return res.status(200).json(result);
     }).catch(err=>{
-        res.status(400).json(err);
+        return res.status(400).json(err);
     })   
 }
 exports.insertData=async function(req,res){
@@ -70,11 +69,11 @@ exports.insertData=async function(req,res){
             new_capital.setMoneyType(req.body.moneyTypeFid);
             new_capital.setCapitalType(1);
         }).catch(err=>{
-            res.status(400).json({"response":err.errors[0].message});
+            return res.status(400).json({"response":err.errors[0].message});
         });
-        res.status(200).json({"response":`The new row has been added with id ${new_income.id}`});
+        return messages.insert(res,1,new_income.id);
     }).catch(err=>{
-        res.status(400).json({"response":err.errors[0].message});
+        return res.status(400).json({"response":err.errors[0].message});
     });
 }
 exports.updateData=async function(req,res){
@@ -83,8 +82,7 @@ exports.updateData=async function(req,res){
         //if they are the same currency
         if(previous_income.moneyTypeId===req.body.moneyTypeFid){
             if((compare_amount=new capitalCalculation().findMoney(previous_income.amount,req.body.amount,"push"))>0 && !(await new capitalCalculation().is_available(compare_amount,previous_income.moneyType.id))){
-                res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-                return;
+                return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
             }
             const compare_money=new capitalCalculation().calculatedMoney(previous_income.amount,req.body.amount,"push");
             if(compare_money[0]!="none"){
@@ -97,8 +95,7 @@ exports.updateData=async function(req,res){
             }
         }else{//if it is different currency
             if(!(await new capitalCalculation().is_available(previous_income.amount,previous_income.moneyType.id))){
-                res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-                return;
+                return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
             }
             capital.bulkCreate([{
                 "amount":previous_income.amount,
@@ -120,18 +117,18 @@ exports.updateData=async function(req,res){
                 "date":req.body.date,
                 "note":req.body.note
             });
-            res.status(200).json({"response":"This data has been updated successfully!!!"});
+            return res.status(200).json({"response":"This data has been updated successfully!!!"});
         }catch(err){
-            res.status(400).json("There is something wrong with updating income");
+            return res.status(400).json("There is something wrong with updating income");
         }
     }catch(err){
-        res.status(400).json({"response":"There is something wrong with check data!!!"});
+        return res.status(400).json({"response":"There is something wrong with check data!!!"});
     }
 }
 exports.deleteData=async function(req,res){
     income.findByPk(req.params.id,{include :{model:moneyType,attributes: ['id','name']}}).then(async result=>{
         if(!(await new capitalCalculation().is_available(result.amount,result.moneyType.id))){
-            res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
+            return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
         }else{
             capital.create({
                 "amount":result.amount,
@@ -140,9 +137,9 @@ exports.deleteData=async function(req,res){
                 "capitalTypeId":2
             });
             result.destroy();
-            res.status(200).json({"response":"This data has been deleted successfully!!!"});
+            return res.status(200).json({"response":"This data has been deleted successfully!!!"});
         }
     }).catch(err=>{
-        res.status(400).json({"response":"There are no income with this id!!!"});
+        return res.status(400).json({"response":"There are no income with this id!!!"});
     });
 }
