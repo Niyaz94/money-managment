@@ -5,6 +5,7 @@ const expenseType           = require("../models/expenseType");
 const moneyType             = require("../models/moneyType");
 const messages              = require("../util/message");
 const capitalCalculation    = require("../validation/calculation/capital").capitalCalculation;
+const multer                = require("multer");
 
 exports.getData=(req,res)=>{
     expense.findByPk(req.params.id,{
@@ -53,6 +54,11 @@ exports.getAllData=function(req,res){
     })   
 }
 exports.insertData=async function(req,res){
+    console.log(req.file);
+    return res.end();
+    
+
+    //req.file.path
     if(!(await new capitalCalculation().is_available(req.body.amount,req.body.moneyTypeFid))){
         return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
     }else{

@@ -1,9 +1,10 @@
 const moment                = require("moment");
-
+const messages              = require("../util/message");
 const property              = require("../models/property");
 const capital               = require("../models/capital");
 const moneyType             = require("../models/moneyType");
 const capitalCalculation    = require("../validation/calculation/capital").capitalCalculation;
+
 
 exports.getData=(req,res)=>{
     property.findByPk(req.params.id,{
@@ -62,7 +63,6 @@ exports.insertData=async function(req,res){
     }).then(new_property=>{
         new_property.setMoneyType(req.body.moneyTypeFid);
         return messages.insert(res,1,new_property.id);
-
     }).catch(err=>{
         return res.status(400).json({"response":err.errors[0].message});
     });
