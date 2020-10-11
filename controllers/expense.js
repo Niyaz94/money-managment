@@ -56,6 +56,11 @@ exports.getAllData=function(req,res){
 }
 exports.insertData=async function(req,res){
     if(!(await new capitalCalculation().is_available(req.body.amount,req.body.moneyTypeFid))){
+        try{
+            fs.unlinkSync(`${req.file.path}`);
+        }catch(err){
+            console.log(err);
+        }
         return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
     }else{
         const extra={};
@@ -82,7 +87,7 @@ exports.insertData=async function(req,res){
             });
             return messages.insert(res,1,new_expense.id);
         }).catch(err=>{
-            return res.status(400).json({"response":err.errors[0].message});
+            return res.status(400).json({"response":err});
         });
     }
 }
@@ -92,6 +97,9 @@ exports.updateData=async function(req,res){
         //if they are the same currency
         if(previous_expense.moneyTypeId===req.body.moneyTypeFid){
             if((compare_amount=new capitalCalculation().findMoney(previous_expense.amount,req.body.amount,"pull"))>0 && !(await new capitalCalculation().is_available(compare_amount,previous_expense.moneyType.id))){
+                try{
+                    fs.unlinkSync(`${req.file.path}`);
+                }catch(err){}
                 return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
             }
             const compare_money=new capitalCalculation().calculatedMoney(previous_expense.amount,req.body.amount,"pull");
