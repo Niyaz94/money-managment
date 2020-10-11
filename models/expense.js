@@ -33,6 +33,14 @@ const expense=sequelize.define('expense',{
     note: {
         type: DataTypes.TEXT,
         allowNull:true
+    },
+    path:{
+        type: DataTypes.TEXT,
+        allowNull:true,
+        defaultValue: null,
+        get: function (){// not use arrow function becuse it does not contain this object
+            return "http://localhost:3000/"+this.getDataValue('path');
+        },
     }
 },{
     paranoid: true,

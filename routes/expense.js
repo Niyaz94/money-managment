@@ -25,6 +25,7 @@ router.route("/:id")
         controller.getData
     ).put(
         [
+            imageUpload,
             validator.updateValidateData
         ],
         controller.updateData

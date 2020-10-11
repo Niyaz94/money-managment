@@ -5,7 +5,8 @@ const expenseType           = require("../models/expenseType");
 const moneyType             = require("../models/moneyType");
 const messages              = require("../util/message");
 const capitalCalculation    = require("../validation/calculation/capital").capitalCalculation;
-const multer                = require("multer");
+const fs                    = require('fs');
+
 
 exports.getData=(req,res)=>{
     expense.findByPk(req.params.id,{
@@ -23,7 +24,7 @@ exports.getData=(req,res)=>{
                 order:[]
             }
         ],
-        attributes: ['id','amount','date','note',['created_at','datetime']]
+        attributes: ['id','path','amount','date','note',['created_at','datetime']]
     }).then(result=>{
         return res.status(result==null?400:200).json(result==null?{"response":"This row not found!!!"}:result);
     }).catch(err=>{
@@ -46,7 +47,7 @@ exports.getAllData=function(req,res){
                 order:[]
             }
         ],
-        attributes: ['id','amount','date','note',['created_at','datetime']]
+        attributes: ['id','path','amount','date','note',['created_at','datetime']]
     }).then(result=>{
         return res.status(200).json(result);
     }).catch(err=>{
@@ -54,18 +55,18 @@ exports.getAllData=function(req,res){
     })   
 }
 exports.insertData=async function(req,res){
-    console.log(req.file);
-    return res.end();
-    
-
-    //req.file.path
     if(!(await new capitalCalculation().is_available(req.body.amount,req.body.moneyTypeFid))){
         return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
     }else{
+        const extra={};
+        if(req.file !== undefined){
+            extra["path"]=req.file.path;
+        }
         expense.create({
             "amount":req.body.amount,
             "date":req.body.date,
-            "note":req.body.note
+            "note":req.body.note,
+            ...extra
         }).then(new_expense=>{
             new_expense.setMoneyType(req.body.moneyTypeFid);
             new_expense.setExpenseType(req.body.expenseTypeFid);
@@ -92,7 +93,6 @@ exports.updateData=async function(req,res){
         if(previous_expense.moneyTypeId===req.body.moneyTypeFid){
             if((compare_amount=new capitalCalculation().findMoney(previous_expense.amount,req.body.amount,"pull"))>0 && !(await new capitalCalculation().is_available(compare_amount,previous_expense.moneyType.id))){
                 return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
-                return;
             }
             const compare_money=new capitalCalculation().calculatedMoney(previous_expense.amount,req.body.amount,"pull");
             if(compare_money[0]!="none"){
@@ -120,12 +120,22 @@ exports.updateData=async function(req,res){
             }]);
         }
         try{
+            const extra={};
+            if(req.file !== undefined){
+                try{
+                    fs.unlinkSync(`${previous_expense.path}`);
+                }catch(err){
+        
+                }
+                extra["path"]=req.file.path;
+            }
             await previous_expense.update({
                 "moneyTypeId":req.body.moneyTypeFid,
                 "expenseTypeId":req.body.expenseTypeFid,
                 "amount":req.body.amount,
                 "date":req.body.date,
-                "note":req.body.note
+                "note":req.body.note,
+                ...extra
             });
             return res.status(200).json({"response":"This data has been updated successfully!!!"});
         }catch(err){
@@ -143,6 +153,11 @@ exports.deleteData=async function(req,res){
             "moneyTypeId":result.moneyTypeId,
             "capitalTypeId":1
         });
+        try{
+            fs.unlinkSync(`${result.path}`);
+        }catch(err){
+
+        }
         result.destroy();
         return res.status(200).json({"response":"This data has been deleted successfully!!!"});
     }).catch(err=>{

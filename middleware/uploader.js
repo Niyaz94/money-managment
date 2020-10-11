@@ -1,11 +1,15 @@
 const multer        = require("multer");
 const path          = require("path"); 
+const mkdirp        = require('mkdirp')
+
 
 module.exports.single=(imagePath,filedName)=>{
     const imageUpload = multer({
             storage: multer.diskStorage({
                 destination: (req, file, next) => {
-                  next(null, imagePath)
+                    mkdirp(imagePath).then(made =>{
+                        next(null, imagePath)
+                    });
                 },
                 filename: (req, file, next) => {
                     const uniqueSuffix = Date.now()+ Math.round(Math.random() * 1E9)

@@ -22,6 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 /** <<<tell you how nodejs handle static files >>> */
 app.use(express.static(path.join(__dirname, 'public')));
+app.use("/uploads",express.static(path.join(__dirname, 'uploads')));
 
 var routerFile = require('./router');
 routerFile.set_route(app);
