@@ -44,6 +44,22 @@ const exchange=sequelize.define('exchange',{
     note: {
         type: DataTypes.TEXT,
         allowNull:true
+    },
+    buyPath:{
+        type: DataTypes.TEXT,
+        allowNull:true,
+        defaultValue: null,
+        get: function (){
+            return "http://localhost:3000/"+this.getDataValue('buyPath');
+        }
+    },
+    sellPath:{
+        type: DataTypes.TEXT,
+        allowNull:true,
+        defaultValue: null,
+        get: function (){
+            return "http://localhost:3000/"+this.getDataValue('sellPath');
+        }
     }
 },{
     paranoid: true,

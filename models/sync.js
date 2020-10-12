@@ -93,6 +93,6 @@ module.exports=()=>{
     console.log(err);
   });
   //exchange.sync({ force: true });
-  //expense.sync({ alter: true });
+  //exchange.sync({ alter: true });
 
 }
