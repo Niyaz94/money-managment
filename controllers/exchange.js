@@ -7,7 +7,7 @@ const capitalCalculation    = require("../validation/calculation/capital").capit
 const needs                 = require("../util/needs");
 
 
-exports.getData=(req,res)=>{
+exports.getData=(req,res,next)=>{
     exchange.findByPk(req.params.id,{
         include:[
             {
@@ -20,20 +20,18 @@ exports.getData=(req,res)=>{
             {
                 model:moneyType,
                 attributes: ['id','name'],
-                as:'buyMoneyType',
-                where:{},
-                order:[]
+                as:'buyMoneyType'
             }
         ],
-        attributes: ['id','sellAmount','buyAmount','date','note',['created_at','datetime']]
+        attributes: ['id','sellAmount','buyAmount','date','note','buyUrlPath','sellUrlPath',['created_at','datetime']]
     }).then(result=>{
-        return res.status(result==null?400:200).json(result==null?{"response":"This row not found!!!"}:result);
-    }).catch(err=>{
-        return res.status(400).json(err);
-    }) 
+        const {buyPath,sellPath,...new_result}=result.get({ plain: true});
+        return res.status(new_result==null?400:200).json(new_result==null?{"response":"This row not found!!!"}:new_result);
+    }).catch(err=>next(err)) 
 }
-exports.getAllData=function(req,res){
+exports.getAllData=function(req,res,next){
     exchange.findAll({
+        //raw: true,
         include:[
             {
                 model:moneyType,
@@ -50,18 +48,21 @@ exports.getAllData=function(req,res){
                 order:[]
             }
         ],
-        attributes: ['id','sellAmount','buyAmount','date','note',['created_at','datetime']]
+        attributes:['id','sellAmount','buyAmount','date','note','buyUrlPath','sellUrlPath',['created_at','datetime']]   
     }).then(result=>{
-        return res.status(200).json(result);
-    }).catch(err=>{
-        return res.status(400).json(err);
-    })   
+        const new_result=result.map(item=>{
+            const {buyPath,sellPath,...new_item}=item.get({ plain: true});
+            return new_item;
+        });
+        return res.status(200).json(new_result);
+    }).catch(err=>next(err))
 }
-exports.insertData=async function(req,res){
-
+exports.insertData=async function(req,res,next){
     if(!(await new capitalCalculation().is_available(req.body.sellAmount,req.body.sellMoneyTypeId))){
         needs.delete_image(req,true,false);
-        return res.status(400).json({"response":"You can't do this operation, not enough money in the capital!!!"});
+        const error = new Error("You can't do this operation, not enough money in the capital!!!");
+        error.status =400;
+        next(error);
     }else{
         const extra={};
         if(req.files !== undefined){
@@ -96,9 +97,7 @@ exports.insertData=async function(req,res){
                 "capitalTypeId":4
             })
             return messages.insert(res,1,new_exchange.id);
-        }).catch(err=>{
-            return res.status(400).json({"response":err.errors[0].message});
-        });
+        }).catch(err=>next(err))
     }
 }
 exports.updateData=async function(req,res){  

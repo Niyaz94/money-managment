@@ -49,16 +49,36 @@ const exchange=sequelize.define('exchange',{
         type: DataTypes.TEXT,
         allowNull:true,
         defaultValue: null,
-        get: function (){
-            return "http://localhost:3000/"+this.getDataValue('buyPath');
-        }
+        //get: function (){
+        //    return "http://localhost:3000/"+this.getDataValue('buyPath');
+        //}
     },
     sellPath:{
         type: DataTypes.TEXT,
         allowNull:true,
         defaultValue: null,
-        get: function (){
-            return "http://localhost:3000/"+this.getDataValue('sellPath');
+        //get: function (){
+        //    return "http://localhost:3000/"+this.getDataValue('sellPath');
+        //}
+    },
+    buyUrlPath: {
+        type: DataTypes.VIRTUAL(DataTypes.STRING,["buyPath"]),
+        get() {
+            if(this.getDataValue('buyPath')===null){
+                return "http://localhost:3000/uploads/general/error.jpg";
+            }else{
+                return "http://localhost:3000/"+this.getDataValue('buyPath');
+            }
+        }
+    },
+    sellUrlPath: {
+        type: DataTypes.VIRTUAL(DataTypes.STRING,["sellPath"]),
+        get () {
+            if(this.getDataValue('sellPath')===null){
+                return "http://localhost:3000/uploads/general/error.jpg";
+            }else{
+                return "http://localhost:3000/"+this.getDataValue('sellPath');
+            }
         }
     }
 },{

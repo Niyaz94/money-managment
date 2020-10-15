@@ -11,5 +11,8 @@
 11- understanding more about promises               ===>>>
 12- adding some needed middleware to the project    ===>>>
 13- tool that create module and controller          ===>>>
-14- adding pdf invoices
-15- just updating some field without other affected
+14- adding pdf invoices                             ===>>>
+15- just updating some field without other affected ===>>>
+16- convert some module to class base               ===>>>  
+17- using session and cookie                        ===>>>
+18- adding log to the system                        ===>>>

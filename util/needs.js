@@ -35,11 +35,10 @@ module.exports=class needs {
         }
     }
     static delete_old_image(path=[]){
-        console.log(path);
         try{
             for (const item of path) {
-                console.log(item);
-                fs.unlinkSync(`${item}`);
+                if(item !== null)
+                    fs.unlinkSync(`${item}`);
             }
             return true;
         }catch(err){

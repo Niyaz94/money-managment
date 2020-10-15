@@ -10,7 +10,6 @@ const logger        = require('morgan');
 const db_sync       = require("./models/sync");
 
 var app = express();
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -33,17 +32,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  // render the error page
-  res.status(err.status || 500).send("<h1> The Page not found</h1>");
-
-  //res.status(400).json({"response":"You are lose becuase this page not found!!!"});
-
-  //res.render('error');
-});
+app.use((err, req, res, next)=>res.status(err.status || 500).json({"message":err.message}));
 //syncronizing with database
 db_sync();
 module.exports = app;

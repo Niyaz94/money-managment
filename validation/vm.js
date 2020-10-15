@@ -5,8 +5,9 @@ const needs                 = require("../util/needs");
 module.exports.case1=(req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()){
-        console.log(needs.delete_image(req));
-        return res.status(422).json({errors: errors.array()});
+        const error = new Error(errors.array()[0]["msg"]);
+        error.status =422;
+        throw error;
     }
     next();
 }

@@ -3,33 +3,33 @@ const {Op}          = require("sequelize");
 
 const check_name=(field)=>{
     return body(field)
-                .exists().withMessage('The name field does not exist!')
+                .exists().withMessage(`The ${field} field does not exist!`)
                 .isAlphanumeric().withMessage('Should contains only letters and numbers!')
                 .trim()
                 .escape()
-                .not().isEmpty().withMessage('The name can not be empty!')
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
                 .isLength({min: 3}).withMessage('Minimum 3 characters required!')
                 .bail();
 }
 const check_name2=(field)=>{
     return body(field)
-                .exists().withMessage('The name field does not exist!')
+                .exists().withMessage(`The ${field} field does not exist!`)
                 .matches(/^[a-z0-9 ]+$|^$/i).withMessage('Should contains only letters and numbers!')
                 .trim()
                 .escape()
-                .not().isEmpty().withMessage('The name can not be empty!')
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
                 .isLength({min: 3}).withMessage('Minimum 3 characters required!')
                 .bail();
 }
 const check_date=(field)=>{
     return body(field)
-                .exists().withMessage('The name field does not exist!')
+                .exists().withMessage(`The ${field} field does not exist!`)
                 .trim()
                 .escape()
-                .not().isEmpty().withMessage('The name can not be empty!')
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
                 .isDate({
                     format:"YYYY-mm-dd"
-                }).withMessage('The date format is wrong!')
+                }).withMessage(`The ${field} format is wrong!`)
                 .bail();
 }
 const check_float=(field,min=0,max=1000000000)=>{
@@ -41,10 +41,10 @@ const check_float=(field,min=0,max=1000000000)=>{
         extra["max"]=max;
     }
     return body(field)
-                .exists().withMessage('The name field does not exist!')
+                .exists().withMessage(`The ${field} field does not exist!`)
                 .trim()
                 .escape()
-                .not().isEmpty().withMessage('The name can not be empty!')
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
                 .isNumeric({min:0,max:1000000000}).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`)
                 .bail();
 }
@@ -57,24 +57,23 @@ const check_int=(field,min=0,max=1000000000)=>{
         extra["max"]=max;
     }
     return body(field)
-                .exists().withMessage('The name field does not exist!')
+                .exists().withMessage(`The ${field} field does not exist!`)
                 .trim()
                 .escape()
                 .toInt()
-                .not().isEmpty().withMessage('The name can not be empty!')
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
                 .isInt(extra).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`)
                 .bail();
 }
 const check_in=(field,values)=>{
     return body(field)
-                .exists().withMessage('The name field does not exist!')
+                .exists().withMessage(`The ${field} field does not exist!`)
                 .isAlpha().withMessage('Should contains only letters!')
                 .trim()
                 .escape()
-                .not().isEmpty().withMessage('The name can not be empty!')
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
                 .isIn(values).withMessage(`The value should be one of those value (${values.join(", ")}) !`)
                 .bail();
-
 }
 /*
     it check for id usually from the url check it if it is number above zero or not
@@ -140,7 +139,6 @@ const check_exist=(module,db_field,body_field,parser_type="body",exist_type="exi
         });
     }
 }
-
 const check_equality=(type="equal",field,check_field)=>{
     if(type=="equal"){
         return body(field).custom((value,{req})=>{
