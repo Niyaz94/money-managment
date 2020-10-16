@@ -8,7 +8,7 @@ const check_name=(field)=>{
                 .trim()
                 .escape()
                 .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isLength({min: 3}).withMessage('Minimum 3 characters required!')
+                .isLength({min: 3,max:20}).withMessage(`The ${field} length should be between 3 and 20 characters.`)
                 .bail();
 }
 const check_name2=(field)=>{
@@ -21,6 +21,17 @@ const check_name2=(field)=>{
                 .isLength({min: 3}).withMessage('Minimum 3 characters required!')
                 .bail();
 }
+
+const check_email=(field)=>{
+    return body(field)
+                .exists().withMessage(`The ${field} field does not exist!`)
+                .trim()
+                .escape()
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
+                .isEmail().withMessage('The email format not correct!')
+                .bail();
+}
+
 const check_date=(field)=>{
     return body(field)
                 .exists().withMessage(`The ${field} field does not exist!`)
@@ -106,7 +117,7 @@ const check_exist=(module,db_field,body_field,parser_type="body",exist_type="exi
         return param(body_field).custom((value,{req})=>{
             return module.findOne({where:{[db_field]:value,...conditions}}).then(new_module=>{
                 if(new_module==null){
-                    return Promise.reject("This value is not exist!");
+                    return Promise.reject(`This ${body_field} is not exist!`);
                 }
             });
         })
@@ -114,7 +125,7 @@ const check_exist=(module,db_field,body_field,parser_type="body",exist_type="exi
         return param(body_field).custom((value,{req})=>{
             return module.findOne({where:{[db_field]:value,...conditions}}).then(new_module=>{
                 if(new_module){
-                    return Promise.reject("This value is already exist!");
+                    return Promise.reject(`This ${body_field} is already exist!`);
                 }
             });
         })
@@ -122,7 +133,7 @@ const check_exist=(module,db_field,body_field,parser_type="body",exist_type="exi
         return body(body_field).custom((value,{req})=>{
             return module.findOne({where:{[db_field]:value,...conditions}}).then(new_module=>{
                 if(new_module==null){
-                    return Promise.reject("This value is not exist!");
+                    return Promise.reject(`This ${body_field} is not exist!`);
                 }
             });
         })
@@ -133,7 +144,7 @@ const check_exist=(module,db_field,body_field,parser_type="body",exist_type="exi
             }
             return module.findOne({where:{[db_field]:value,...conditions}}).then(new_module=>{
                 if(new_module){
-                    return Promise.reject("This value is already exist!");
+                    return Promise.reject(`This ${body_field} is already exist!`);
                 }
             });
         });
@@ -167,5 +178,6 @@ module.exports ={
     check_date:check_date,
     check_float:check_float,
     check_equality:check_equality,
-    check_in:check_in
+    check_in:check_in,
+    check_email:check_email
 }

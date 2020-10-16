@@ -1,13 +1,14 @@
-const sequelize         =require('../util/database');
-const moneyType         =require('./moneyType');
-const capitalType       =require('./capitalType');
-const incomeType        =require('./incomeType');
-const expenseType       =require('./expenseType');
-const capital           =require('./capital');
-const income            =require('./income');
-const exchange          =require('./exchange');
-const expense           =require('./expense');
-const property           =require('./property');
+const sequelize         = require('../util/database');
+const moneyType         = require('./moneyType');
+const capitalType       = require('./capitalType');
+const incomeType        = require('./incomeType');
+const expenseType       = require('./expenseType');
+const capital           = require('./capital');
+const income            = require('./income');
+const exchange          = require('./exchange');
+const expense           = require('./expense');
+const property          = require('./property');
+const user              = require('./user');
 
 module.exports=()=>{
 
@@ -93,6 +94,6 @@ module.exports=()=>{
     console.log(err);
   });
   //exchange.sync({ force: true });
-  //exchange.sync({ alter: true });
+  //user.sync({ force: true });
 
 }

@@ -13,5 +13,6 @@ module.exports.set_route = function(app) {
     app.use('/exchange',[],require('./routes/exchange'));
     app.use('/capital',[],require('./routes/capital'));
     app.use('/property',[],require('./routes/property'));
+    app.use('/user',[],require('./routes/user'));
 }
  
