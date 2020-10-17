@@ -1,10 +1,9 @@
 const { Sequelize } =require("sequelize");
 
 const sequelize = new Sequelize(
-    //"money_management",
-    "test",
-    "local_admin",
-    "61#2d2A2j51^_4",
+    process.env.db_name,
+    process.env.db_user,
+    process.env.db_pass,
     {
         dialect:'mysql',
         host:'localhost',

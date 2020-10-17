@@ -81,7 +81,6 @@ const user=sequelize.define('user',{
     indexes:[
     ]
 });
-//await user.validPassword("13456")
 user.prototype.validPassword = async function(password) {
     return await bcrypt.compare(password, this.password);
 }

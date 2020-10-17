@@ -3,32 +3,32 @@ const moneyType     = require("../models/moneyType");
 const expense       = require("../models/expense");
 
 
-const {check_id,check_exist,check_text2,check_date,check_int,check_float}=require("./extra");
-const {case1}=require("./vm");
+const {ID,EXIST,TEXT,DATE,INT,FLOAT}=require("./rules/validation_rules");
+const {case1}=require("./rules/validation_errors");
 
 exports.validateID = [
-    check_id("id"),
-    check_exist(expense,"id","id","param","not_exist"),
+    ID("id"),
+    EXIST(expense,"id","id","param","not_exist"),
     case1
 ];
 exports.insertValidateData = [
-    check_text2("note"),
-    check_date("date"),
-    check_int("expenseTypeFid",1,1000),
-    check_exist(expenseType,"id","expenseTypeFid","body","not_exist"),
-    check_int("moneyTypeFid",1,1000),
-    check_exist(moneyType,"id","moneyTypeFid","body","not_exist"),
-    check_float("amount"),
+    TEXT("note"),
+    DATE("date"),
+    INT("expenseTypeFid",1,1000),
+    EXIST(expenseType,"id","expenseTypeFid","body","not_exist"),
+    INT("moneyTypeFid",1,1000),
+    EXIST(moneyType,"id","moneyTypeFid","body","not_exist"),
+    FLOAT("amount"),
     case1
 ];
 exports.updateValidateData = [
-    check_id("id"),
-    check_text2("note"),
-    check_date("date"),
-    check_int("expenseTypeFid",1,1000),
-    check_exist(expenseType,"id","expenseTypeFid","body","not_exist"),
-    check_int("moneyTypeFid",1,1000),
-    check_exist(moneyType,"id","moneyTypeFid","body","not_exist"),
-    check_float("amount"),
+    ID("id"),
+    TEXT("note"),
+    DATE("date"),
+    INT("expenseTypeFid",1,1000),
+    EXIST(expenseType,"id","expenseTypeFid","body","not_exist"),
+    INT("moneyTypeFid",1,1000),
+    EXIST(moneyType,"id","moneyTypeFid","body","not_exist"),
+    FLOAT("amount"),
     case1
 ];

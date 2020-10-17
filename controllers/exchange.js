@@ -3,7 +3,7 @@ const exchange              = require("../models/exchange");
 const capital               = require("../models/capital");
 const moneyType             = require("../models/moneyType");
 const messages              = require("../util/message");
-const capitalCalculation    = require("../validation/calculation/capital").capitalCalculation;
+const capitalCalculation    = require("../validation/rules/capital").capitalCalculation;
 const needs                 = require("../util/needs");
 
 

@@ -17,17 +17,17 @@ router.route("/")
 router.route("/:id")
     .get(
         [
-            //validator.validateID
+            validator.validateID
         ],
         controller.getData
     ).put(
         [
-            //validator.updateValidateData
+            validator.updateValidateData
         ],
         controller.updateData
     ).delete(
         [
-            //validator.validateID
+            validator.validateID
         ],
         controller.deleteData
     );

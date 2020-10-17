@@ -1,28 +1,30 @@
 const {body,param}  = require('express-validator');
 const {Op}          = require("sequelize");
 
-const check_name=(field)=>{
+const NAME=(field,type="c1")=>{
+    const validator=body(field)
+    .exists().withMessage(`The ${field} field does not exist!`).bail()
+    .trim()
+    .escape()
+    .not().isEmpty().withMessage(`The ${field} can not be empty!`).bail();
+    if(type=="c1"){
+        validator.isAlphanumeric().withMessage('Should contains only letters and numbers!').bail()
+    }else if(type=="c2"){
+        validator.matches(/^[a-z0-9 ]+$|^$/i).withMessage('Should contains only letters and numbers!').bail()
+    }
+    return validator.isLength({min: 3,max:20}).withMessage(`The ${field} length should be between 3 and 20 characters.`).bail();
+}
+const PASSWORD=(field)=>{
     return body(field)
                 .exists().withMessage(`The ${field} field does not exist!`)
-                .isAlphanumeric().withMessage('Should contains only letters and numbers!')
                 .trim()
                 .escape()
                 .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isLength({min: 3,max:20}).withMessage(`The ${field} length should be between 3 and 20 characters.`)
+                .isLength({min: 8}).withMessage('Minimum 3 characters required!')
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[#?!@$%^&*-])[0-9a-zA-Z_#?!@$%^&*-]{8,}$/, "i").withMessage(`The password formrat is wrong!`)
                 .bail();
 }
-const check_name2=(field)=>{
-    return body(field)
-                .exists().withMessage(`The ${field} field does not exist!`)
-                .matches(/^[a-z0-9 ]+$|^$/i).withMessage('Should contains only letters and numbers!')
-                .trim()
-                .escape()
-                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isLength({min: 3}).withMessage('Minimum 3 characters required!')
-                .bail();
-}
-
-const check_email=(field)=>{
+const EMAIL=(field)=>{
     return body(field)
                 .exists().withMessage(`The ${field} field does not exist!`)
                 .trim()
@@ -31,8 +33,7 @@ const check_email=(field)=>{
                 .isEmail().withMessage('The email format not correct!')
                 .bail();
 }
-
-const check_date=(field)=>{
+const DATE=(field)=>{
     return body(field)
                 .exists().withMessage(`The ${field} field does not exist!`)
                 .trim()
@@ -43,7 +44,7 @@ const check_date=(field)=>{
                 }).withMessage(`The ${field} format is wrong!`)
                 .bail();
 }
-const check_float=(field,min=0,max=1000000000)=>{
+const FLOAT=(field,min=0,max=1000000000)=>{
     extra={min:min,max:max};
     if(min!==undefined && !isNaN(min)){
         extra["min"]=min;
@@ -59,7 +60,7 @@ const check_float=(field,min=0,max=1000000000)=>{
                 .isNumeric({min:0,max:1000000000}).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`)
                 .bail();
 }
-const check_int=(field,min=0,max=1000000000)=>{
+const INT=(field,min=0,max=1000000000)=>{
     extra={min:min,max:max};
     if(min!==undefined && !isNaN(min)){
         extra["min"]=min;
@@ -76,7 +77,7 @@ const check_int=(field,min=0,max=1000000000)=>{
                 .isInt(extra).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`)
                 .bail();
 }
-const check_in=(field,values)=>{
+const IN=(field,values)=>{
     return body(field)
                 .exists().withMessage(`The ${field} field does not exist!`)
                 .isAlpha().withMessage('Should contains only letters!')
@@ -86,10 +87,10 @@ const check_in=(field,values)=>{
                 .isIn(values).withMessage(`The value should be one of those value (${values.join(", ")}) !`)
                 .bail();
 }
-/*
-    it check for id usually from the url check it if it is number above zero or not
-*/
-const check_id=(field)=>{
+const ID=(field)=>{
+    /*
+        it check for id usually from the url check it if it is number above zero or not
+    */
     return param(field)
                 .exists().withMessage('The id param does not exist!')
                 .trim()
@@ -97,22 +98,18 @@ const check_id=(field)=>{
                 .isInt({min:1}).withMessage('Should be integer number above 0!')
                 .bail();
 }
-const check_text=(field)=>{
-    return body(field)
+const TEXT=(field,type="c1")=>{
+    const validator=body(field)
                 .trim()
                 .escape()
-                .isLength({max:100}).withMessage('Content should be almost 50  characters!')
-                .matches(/^[a-z0-9 ,.]+$|^$/i).withMessage('Should contains only letters and numbers!')
-                .bail();
+                .isLength({max:100}).withMessage('Content should be almost 50  characters!').bail();
+
+    if(type=="c2"){
+        validator.matches(/^[a-z0-9 ,.]+$|^$/i).withMessage('Should contains only letters and numbers!');
+    }
+    return validator;
 }
-const check_text2=(field)=>{
-    return body(field)
-                .trim()
-                .escape()
-                .isLength({max:100}).withMessage('Content should be almost 50  characters!')
-                .bail();
-}
-const check_exist=(module,db_field,body_field,parser_type="body",exist_type="exist"/** exist,not_exist*/,conditions={})=>{
+const EXIST=(module,db_field,body_field,parser_type="body",exist_type="exist"/** exist,not_exist*/,conditions={})=>{
     if(parser_type=="param" && exist_type=="not_exist"){//give you error if the value not found
         return param(body_field).custom((value,{req})=>{
             return module.findOne({where:{[db_field]:value,...conditions}}).then(new_module=>{
@@ -150,34 +147,33 @@ const check_exist=(module,db_field,body_field,parser_type="body",exist_type="exi
         });
     }
 }
-const check_equality=(type="equal",field,check_field)=>{
+const EQUALITY=(type="equal",field,check_field)=>{
     if(type=="equal"){
         return body(field).custom((value,{req})=>{
-            if (value !== req.body[check_field]) {
-                throw new Error('Both field should have the same value!');
+            if (req.body[check_field]===undefined || value !== req.body[check_field]) {
+                throw new Error(`Both '${field}' and '${check_field}' should have the same value!`);
             }
             return true;
         })
     }else if(type=="not_equal"){
         return body(field).custom((value,{req})=>{
-            if (value === req.body[check_field]) {
-                throw new Error('The fields should have different value!');
+            if (req.body[check_field]===undefined || value === req.body[check_field]) {
+                throw new Error(`'${field}' and '${check_field}' should have different value!`);
             }
             return true;
         })
     }
 }
 module.exports ={
-    check_id:check_id,
-    check_name:check_name,
-    check_name2:check_name2,
-    check_exist:check_exist,
-    check_text:check_text,
-    check_text2:check_text2,
-    check_int:check_int,
-    check_date:check_date,
-    check_float:check_float,
-    check_equality:check_equality,
-    check_in:check_in,
-    check_email:check_email
+    ID:ID,
+    NAME:NAME,
+    EXIST:EXIST,
+    TEXT:TEXT,
+    INT:INT,
+    DATE:DATE,
+    FLOAT:FLOAT,
+    EQUALITY:EQUALITY,
+    IN:IN,
+    EMAIL:EMAIL,
+    PASSWORD:PASSWORD
 }

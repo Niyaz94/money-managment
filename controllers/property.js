@@ -3,7 +3,7 @@ const messages              = require("../util/message");
 const property              = require("../models/property");
 const capital               = require("../models/capital");
 const moneyType             = require("../models/moneyType");
-const capitalCalculation    = require("../validation/calculation/capital").capitalCalculation;
+const capitalCalculation    = require("../validation/rules/capital").capitalCalculation;
 
 
 exports.getData=(req,res)=>{

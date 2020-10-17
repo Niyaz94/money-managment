@@ -4,7 +4,7 @@ const capital              = require("../models/capital");
 const incomeType           = require("../models/incomeType");
 const moneyType            = require("../models/moneyType");
 const messages             = require("../util/message");
-const capitalCalculation   = require("../validation/calculation/capital").capitalCalculation;
+const capitalCalculation   = require("../validation/rules/capital").capitalCalculation;
 
 
 exports.getData=(req,res)=>{

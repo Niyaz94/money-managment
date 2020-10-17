@@ -1,37 +1,37 @@
 const moneyType     = require("../models/moneyType");
 const exchange      = require("../models/exchange");
 
-const {check_id,check_exist,check_text,check_date,check_int,check_float,check_equality}=require("./extra");
-const {case1}=require("./vm");
+const {ID,EXIST,TEXT,DATE,INT,FLOAT,EQUALITY}=require("./rules/validation_rules");
+const {case1}=require("./rules/validation_errors");
 
 exports.validateID = [
-    check_id("id"),
-    check_exist(exchange,"id","id","param","not_exist"),
+    ID("id"),
+    EXIST(exchange,"id","id","param","not_exist"),
     case1
 ];
 exports.insertValidateData = [
-    check_text("note"),
-    check_date("date"),
-    check_float("sellAmount"),
-    check_float("buyAmount"),
-    check_int("sellMoneyTypeId",1,1000),
-    check_int("buyMoneyTypeId",1,1000),
-    check_exist(moneyType,"id","sellMoneyTypeId","body","not_exist"),
-    check_exist(moneyType,"id","buyMoneyTypeId","body","not_exist"),
-    check_equality("not_equal","sellMoneyTypeId","buyMoneyTypeId"),
+    TEXT("note"),
+    DATE("date"),
+    FLOAT("sellAmount"),
+    FLOAT("buyAmount"),
+    INT("sellMoneyTypeId",1,1000),
+    INT("buyMoneyTypeId",1,1000),
+    EXIST(moneyType,"id","sellMoneyTypeId","body","not_exist"),
+    EXIST(moneyType,"id","buyMoneyTypeId","body","not_exist"),
+    EQUALITY("not_equal","sellMoneyTypeId","buyMoneyTypeId"),
     case1
 ];
 exports.updateValidateData = [
-    check_id("id"),
-    check_exist(exchange,"id","id","param","not_exist"),
-    check_text("note"),
-    check_date("date"),
-    check_float("sellAmount"),
-    check_float("buyAmount"),
-    check_int("sellMoneyTypeId",1,1000),
-    check_int("buyMoneyTypeId",1,1000),
-    check_exist(moneyType,"id","sellMoneyTypeId","body","not_exist"),
-    check_exist(moneyType,"id","buyMoneyTypeId","body","not_exist"),
-    check_equality("not_equal","sellMoneyTypeId","buyMoneyTypeId"),
+    ID("id"),
+    EXIST(exchange,"id","id","param","not_exist"),
+    TEXT("note"),
+    DATE("date"),
+    FLOAT("sellAmount"),
+    FLOAT("buyAmount"),
+    INT("sellMoneyTypeId",1,1000),
+    INT("buyMoneyTypeId",1,1000),
+    EXIST(moneyType,"id","sellMoneyTypeId","body","not_exist"),
+    EXIST(moneyType,"id","buyMoneyTypeId","body","not_exist"),
+    EQUALITY("not_equal","sellMoneyTypeId","buyMoneyTypeId"),
     case1
 ];
