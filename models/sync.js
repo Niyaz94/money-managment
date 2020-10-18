@@ -96,4 +96,9 @@ module.exports=()=>{
   //exchange.sync({ force: true });
   //user.sync({ force: true });
 
+  //moneyType.destroy({
+  //  where: {},
+  //  truncate: true
+  //});
+
 }

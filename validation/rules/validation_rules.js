@@ -146,16 +146,4 @@ const EQUALITY=(type="equal",field,check_field)=>{
         })
     }
 }
-module.exports ={
-    ID:ID,
-    NAME:NAME,
-    EXIST:EXIST,
-    TEXT:TEXT,
-    INT:INT,
-    DATE:DATE,
-    FLOAT:FLOAT,
-    EQUALITY:EQUALITY,
-    IN:IN,
-    EMAIL:EMAIL,
-    PASSWORD:PASSWORD
-}
+module.exports ={ID,NAME,EXIST,TEXT,INT,DATE,FLOAT,EQUALITY,IN,EMAIL,PASSWORD}
