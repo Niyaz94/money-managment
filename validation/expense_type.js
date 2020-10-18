@@ -1,7 +1,6 @@
-const expenseType= require("../models/expenseType");
-
-const {ID,NAME,EXIST,TEXT}=require("./rules/validation_rules");
-const {case1}=require("./rules/validation_errors");
+const expenseType           = require("../models/expenseType");
+const {ID,NAME,EXIST,TEXT}  = require("./rules/validation_rules");
+const {case1}               = require("./rules/validation_errors");
 
 exports.validateID = [
     ID("id"),

@@ -1,8 +1,7 @@
-const moneyType     = require("../models/moneyType");
-const exchange      = require("../models/exchange");
-
-const {ID,EXIST,TEXT,DATE,INT,FLOAT,EQUALITY}=require("./rules/validation_rules");
-const {case1}=require("./rules/validation_errors");
+const moneyType                                 = require("../models/moneyType");
+const exchange                                  = require("../models/exchange");
+const {ID,EXIST,TEXT,DATE,INT,FLOAT,EQUALITY}   = require("./rules/validation_rules");
+const {case1}                                   = require("./rules/validation_errors");
 
 exports.validateID = [
     ID("id"),

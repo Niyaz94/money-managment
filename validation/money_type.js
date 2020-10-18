@@ -1,7 +1,6 @@
-const moneyType= require("../models/moneyType");
-
-const {ID,NAME,EXIST}=require("./rules/validation_rules");
-const {case1}=require("./rules/validation_errors");
+const moneyType         = require("../models/moneyType");
+const {ID,NAME,EXIST}   = require("./rules/validation_rules");
+const {case1}           = require("./rules/validation_errors");
 
 exports.validateID = [
     ID("id"),

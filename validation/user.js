@@ -1,7 +1,6 @@
-const user        = require("../models/user");
-
-const {ID,EXIST,PASSWORD,EMAIL,NAME,EQUALITY}=require("./rules/validation_rules");
-const {case1}=require("./rules/validation_errors");
+const user                                      = require("../models/user");
+const {ID,EXIST,PASSWORD,EMAIL,NAME,EQUALITY}   = require("./rules/validation_rules");
+const {case1}                                   = require("./rules/validation_errors");
 
 
 exports.insertValidateData = [

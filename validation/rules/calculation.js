@@ -1,5 +1,5 @@
-const needs=require("../../util/needs");
-const extra=require("../../models/extra");
+const needs =   require("../../util/needs");
+const extra =   require("../../models/extra");
 
 class calculation{
     async is_available (amount,money_type){

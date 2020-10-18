@@ -1,9 +1,8 @@
-const incomeType    = require("../models/incomeType");
-const moneyType     = require("../models/moneyType");
-const income        = require("../models/income");
-
-const {ID,EXIST,TEXT,DATE,INT,FLOAT}=require("./rules/validation_rules");
-const {case1}=require("./rules/validation_errors");
+const incomeType                        = require("../models/incomeType");
+const moneyType                         = require("../models/moneyType");
+const income                            = require("../models/income");
+const {ID,EXIST,TEXT,DATE,INT,FLOAT}    = require("./rules/validation_rules");
+const {case1}                           = require("./rules/validation_errors");
 
 exports.validateID = [
     ID("id"),

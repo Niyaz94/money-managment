@@ -3,46 +3,46 @@ const {Op}          = require("sequelize");
 
 const NAME=(field,type="c1")=>{
     const validator=body(field)
-    .exists().withMessage(`The ${field} field does not exist!`).bail()
-    .trim()
-    .escape()
-    .not().isEmpty().withMessage(`The ${field} can not be empty!`).bail();
+                .exists().withMessage(`The ${field} field does not exist!`).bail()
+                .trim().escape()
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`).bail();
+
     if(type=="c1"){
-        validator.isAlphanumeric().withMessage('Should contains only letters and numbers!').bail()
+        validator.isAlphanumeric().withMessage(`The ${field} field Should contains only letters and numbers!`).bail()
     }else if(type=="c2"){
-        validator.matches(/^[a-z0-9 ]+$|^$/i).withMessage('Should contains only letters and numbers!').bail()
+        validator.matches(/^[a-z0-9 ]+$|^$/i).withMessage(`The ${field} field Should contains only letters and numbers!`).bail()
     }
     return validator.isLength({min: 3,max:20}).withMessage(`The ${field} length should be between 3 and 20 characters.`).bail();
 }
+const TEXT=(field,type="c1")=>{
+    const validator=body(field).trim().escape()
+            .isLength({max:100}).withMessage('Content should be almost 50  characters!').bail();
+    if(type=="c2"){
+        validator.matches(/^[a-z0-9 ,.]+$|^$/i).withMessage('Should contains only letters and numbers!');
+    }
+    return validator;
+}
 const PASSWORD=(field)=>{
     return body(field)
-                .exists().withMessage(`The ${field} field does not exist!`)
-                .trim()
-                .escape()
-                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isLength({min: 8}).withMessage('Minimum 3 characters required!')
-                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[#?!@$%^&*-])[0-9a-zA-Z_#?!@$%^&*-]{8,}$/, "i").withMessage(`The password formrat is wrong!`)
-                .bail();
+                .exists().withMessage(`The ${field} field does not exist!`).bail()
+                .trim().escape()
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`).bail()
+                .isLength({min: 8}).withMessage(`The ${field} field should be 8 characters or more!`).bail()
+                .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[#?!@$%^&*-])[0-9a-zA-Z_#?!@$%^&*-]{8,}$/, "i").withMessage(`The ${field} field formrat is wrong!`).bail();
 }
 const EMAIL=(field)=>{
     return body(field)
-                .exists().withMessage(`The ${field} field does not exist!`)
-                .trim()
-                .escape()
-                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isEmail().withMessage('The email format not correct!')
-                .bail();
+                .exists().withMessage(`The ${field} field does not exist!`).bail()
+                .trim().escape()
+                .not().isEmpty().withMessage(`The ${field} can not be empty!`).bail()
+                .isEmail().withMessage(`The ${field} field format not correct!`).bail();
 }
 const DATE=(field)=>{
     return body(field)
-                .exists().withMessage(`The ${field} field does not exist!`)
-                .trim()
-                .escape()
-                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isDate({
-                    format:"YYYY-mm-dd"
-                }).withMessage(`The ${field} format is wrong!`)
-                .bail();
+                .exists().withMessage(`The ${field} field does not exist!`).bail()
+                .trim().escape()
+                .not().isEmpty().withMessage(`The ${field} field can not be empty!`).bail()
+                .isDate({format:"YYYY-mm-dd"}).withMessage(`The ${field} field format is wrong!`).bail();
 }
 const FLOAT=(field,min=0,max=1000000000)=>{
     extra={min:min,max:max};
@@ -53,12 +53,10 @@ const FLOAT=(field,min=0,max=1000000000)=>{
         extra["max"]=max;
     }
     return body(field)
-                .exists().withMessage(`The ${field} field does not exist!`)
-                .trim()
-                .escape()
-                .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isNumeric({min:0,max:1000000000}).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`)
-                .bail();
+                .exists().withMessage(`The ${field} field does not exist!`).bail()
+                .trim().escape()
+                .not().isEmpty().withMessage(`The ${field} field can not be empty!`).bail()
+                .isNumeric({min:0,max:1000000000}).withMessage(`The ${field} field Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`).bail();
 }
 const INT=(field,min=0,max=1000000000)=>{
     extra={min:min,max:max};
@@ -70,19 +68,16 @@ const INT=(field,min=0,max=1000000000)=>{
     }
     return body(field)
                 .exists().withMessage(`The ${field} field does not exist!`)
-                .trim()
-                .escape()
+                .trim().escape()
                 .toInt()
                 .not().isEmpty().withMessage(`The ${field} can not be empty!`)
-                .isInt(extra).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`)
-                .bail();
+                .isInt(extra).withMessage(`Should be integer number between ${min!==undefined?min:0} and ${max!==undefined?max:1000000000}!`).bail();
 }
 const IN=(field,values)=>{
     return body(field)
                 .exists().withMessage(`The ${field} field does not exist!`)
+                .trim().escape()
                 .isAlpha().withMessage('Should contains only letters!')
-                .trim()
-                .escape()
                 .not().isEmpty().withMessage(`The ${field} can not be empty!`)
                 .isIn(values).withMessage(`The value should be one of those value (${values.join(", ")}) !`)
                 .bail();
@@ -93,21 +88,8 @@ const ID=(field)=>{
     */
     return param(field)
                 .exists().withMessage('The id param does not exist!')
-                .trim()
-                .escape()
-                .isInt({min:1}).withMessage('Should be integer number above 0!')
-                .bail();
-}
-const TEXT=(field,type="c1")=>{
-    const validator=body(field)
-                .trim()
-                .escape()
-                .isLength({max:100}).withMessage('Content should be almost 50  characters!').bail();
-
-    if(type=="c2"){
-        validator.matches(/^[a-z0-9 ,.]+$|^$/i).withMessage('Should contains only letters and numbers!');
-    }
-    return validator;
+                .trim().escape()
+                .isInt({min:1}).withMessage('Should be integer number above 0!').bail();
 }
 const EXIST=(module,db_field,body_field,parser_type="body",exist_type="exist"/** exist,not_exist*/,conditions={})=>{
     if(parser_type=="param" && exist_type=="not_exist"){//give you error if the value not found

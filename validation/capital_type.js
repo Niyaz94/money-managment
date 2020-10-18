@@ -1,7 +1,6 @@
-const capitalType= require("../models/capitalType");
-
-const {ID,NAME,EXIST,TEXT}=require("./rules/validation_rules");
-const {case1}=require("./rules/validation_errors");
+const capitalType           = require("../models/capitalType");
+const {ID,NAME,EXIST,TEXT}  = require("./rules/validation_rules");
+const {case1}               = require("./rules/validation_errors");
 
 exports.validateID = [
     ID("id"),
