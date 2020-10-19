@@ -1,44 +1,44 @@
-require('dotenv').config({path:"../.env"});
-
-console.log(process.env.db_name);
-
-process.env.db_name="test";
-process.env.db_pass="61#2d2A2j51^_4";
-process.env.db_user="local_admin";
+//calling server should be before calling modules
+const server        = require('../bin/www');
+require('dotenv').config({path: __dirname + '/.env.test'})
 
 const MONEYTYPE     = require('../models/moneyType');
+
+
 const chai          = require('chai');
-const chaiHttp      = require('chai-http');
-const server        = require('../bin/www');
 const should        = chai.should();
 
-//process.env.db_name = 'test';
+const chaiHttp      = require('chai-http');
+
+
+
 chai.use(chaiHttp);
 
 describe('MoneyType', () => {
-    //beforeEach((done) => {
-        //MONEYTYPE.destroy({
-        //    where: {},
-        //    truncate: true
-        //});
-        //MONEYTYPE.sync({ force: true });
-        //done();
-    //});
+    beforeEach(async (done) => {
+        //try {
+            //await MONEYTYPE.destroy({where: {},truncate: true});
+            //await MONEYTYPE.sync({ force: true });
+            await MONEYTYPE.destroy({
+                force: true,
+                //truncate : true, 
+                //cascade: false
+            })
+            //await MONEYTYPE.create({name: 'Titolo3'});
+            done();
+        //}catch(err){
+        //    console.log("Hi");
+        //    done();
+        //}
+    });
     describe('/GET moneyType', () => {
         it('it should GET all money type', (done) => {
             chai.request(server).get('/moneytype').end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('array');
-                res.body.length.should.be.eql(0);
+                res.body.length.should.be.eql(1);
                 done();
             });
-            //done();
-            //MONEYTYPE.create({
-            //    name: 'Titolo'
-            //}).then( function (moneytype) {
-            //    expect(moneytype).to.equal('promise resolved');
-            //    done();
-            //}).catch(done);;
         });
     });
 });

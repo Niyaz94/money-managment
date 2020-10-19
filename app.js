@@ -1,18 +1,19 @@
+require('dotenv-flow').config({
+  default_node_env:"development",
+  node_env:"test",
+  path:__dirname + '/env'
+});
+
 const createError   = require('http-errors');
 const express       = require('express');
 const path          = require('path');
 const cookieParser  = require('cookie-parser');
 const bodyParser    = require('body-parser');
 const logger        = require('morgan');
-require('dotenv').config();
-
-
-
-
 
 const db_sync       = require("./models/sync");
-
 var app = express();
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
