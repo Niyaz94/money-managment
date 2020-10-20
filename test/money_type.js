@@ -1,7 +1,8 @@
 //calling server should be before calling modules
-const server        = require('../bin/www');
-require('dotenv').config({path: __dirname + '/.env.test'})
+const server            = require('../bin/www');
+const sequelize         = require('../util/database');
 
+//require('dotenv').config({path: __dirname + '/.env.test'})
 const MONEYTYPE     = require('../models/moneyType');
 
 
@@ -15,21 +16,26 @@ const chaiHttp      = require('chai-http');
 chai.use(chaiHttp);
 
 describe('MoneyType', () => {
-    beforeEach(async (done) => {
-        //try {
+    before(async (done) => {
+        try {
+            await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, { raw: true });
+            await MONEYTYPE.sync({force:true}).then(async data=>{
+                await sequelize.query('SET FOREIGN_KEY_CHECKS = 1', { raw: true });
+                await MONEYTYPE.create({name: 'Titolo1'});
+            }).catch(done);
+
             //await MONEYTYPE.destroy({where: {},truncate: true});
             //await MONEYTYPE.sync({ force: true });
-            await MONEYTYPE.destroy({
-                force: true,
-                //truncate : true, 
-                //cascade: false
-            })
-            //await MONEYTYPE.create({name: 'Titolo3'});
+            //MONEYTYPE.sync({ force: true });
+            //await MONEYTYPE.destroy({
+            //    force: true,
+            //    //truncate : true, 
+            //    //cascade: false
+            //});
             done();
-        //}catch(err){
-        //    console.log("Hi");
-        //    done();
-        //}
+        }catch(err){
+            done();
+        }
     });
     describe('/GET moneyType', () => {
         it('it should GET all money type', (done) => {

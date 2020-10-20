@@ -93,6 +93,8 @@ module.exports=()=>{
   }).catch(err=>{
     console.log(err);
   });
+
+  //MONEYTYPE.destroy({force: true//truncate : true,cascade: false});
   //exchange.sync({ force: true });
   //user.sync({ force: true });
 
@@ -101,4 +103,10 @@ module.exports=()=>{
   //  truncate: true
   //});
 
+
+  //moneyType.sync({ 
+  //  force: true,
+  //  truncate : true, 
+  //  cascade: false
+  //});
 }
