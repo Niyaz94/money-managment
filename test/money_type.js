@@ -1,41 +1,22 @@
 //calling server should be before calling modules
 const server            = require('../bin/www');
+const chai              = require('chai');
+const should            = chai.should();
+const chaiHttp          = require('chai-http');
+
 const sequelize         = require('../util/database');
-
-//require('dotenv').config({path: __dirname + '/.env.test'})
-const MONEYTYPE     = require('../models/moneyType');
-
-
-const chai          = require('chai');
-const should        = chai.should();
-
-const chaiHttp      = require('chai-http');
+const MONEYTYPE         = require('../models/moneyType');
 
 
 
 chai.use(chaiHttp);
 
 describe('MoneyType', () => {
-    before(async (done) => {
-        try {
-            await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, { raw: true });
-            await MONEYTYPE.sync({force:true}).then(async data=>{
-                await sequelize.query('SET FOREIGN_KEY_CHECKS = 1', { raw: true });
-                await MONEYTYPE.create({name: 'Titolo1'});
-            }).catch(done);
-
-            //await MONEYTYPE.destroy({where: {},truncate: true});
-            //await MONEYTYPE.sync({ force: true });
-            //MONEYTYPE.sync({ force: true });
-            //await MONEYTYPE.destroy({
-            //    force: true,
-            //    //truncate : true, 
-            //    //cascade: false
-            //});
-            done();
-        }catch(err){
-            done();
-        }
+    before(async () => {
+        await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+        await MONEYTYPE.destroy({force:true,where: {},truncate: true}); 
+        await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+        await MONEYTYPE.create({name: 'niyaz2Fuck'}); 
     });
     describe('/GET moneyType', () => {
         it('it should GET all money type', (done) => {
