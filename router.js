@@ -6,7 +6,7 @@ module.exports.set_route = function(app) {
     //).put('*',
     //  require("./middleware/contentType").check("json"),
     //);
-    app.use('/moneytype',[/* is_auth */],require('./routes/money_type'));
+    app.use('/moneytype',[ is_auth ],require('./routes/money_type'));
     app.use('/expensetype',[is_auth],require('./routes/expense_type'));
     app.use('/incometype',[is_auth],require('./routes/income_type'));
     app.use('/capitaltype',[is_auth],require('./routes/capital_type'));
