@@ -8,10 +8,7 @@ const router = express.Router();
 
 router.route("/")
     .post(
-        [
-            imageUpload,
-            validator.insertValidateData
-        ],
+        [imageUpload,validator.insertValidateData],
         controller.insertData
     ).get(
         controller.getAllData
